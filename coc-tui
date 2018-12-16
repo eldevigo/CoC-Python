@@ -1,0 +1,107 @@
+#!/usr/bin/env python3
+
+import argparse
+from blessed import Terminal
+import sys
+import os
+import yaml
+
+import coc
+from coc.exceptions import *
+
+t = Terminal()
+
+def echo(text):
+    """Display ``text`` and flush output."""
+    sys.stdout.write(u'{}'.format(text))
+    sys.stdout.flush()
+
+def select_player(save_path):
+# Read existing save files to populate the menu
+    try:
+        with open(save_path + '/saves.yaml', 'r') as file:
+            saves = yaml.load(file.read())
+        menu = {a:b for a,b in zip('1234567890abcdef', saves['files'].keys())}
+    except (yaml.YAMLError, KeyError) as e:
+        raise LoadError("Unable to load your saves.\n"
+                "saves.yaml is corrupted!") from e
+    except FileNotFoundError as e:
+# No save.yaml yet on the target path. Assume this is an uninitialized save path.
+        saves = {'files': dict()}
+        with open(save_path + 'saves.yaml', 'w+') as file:
+            file.write(yaml.dump(saves))
+        menu = dict()
+    maxheight = t.height - 5
+    renderable_menu = list(menu.items())[-maxheight:]
+    renderable_menu.append(('n', '< new game >'))
+    # TODO: Add support for scrolling the save menu if it's too long for the terminal
+
+# Render the selection menu
+    echo(t.enter_fullscreen)
+    with t.location(3, 0):
+        echo(t.bold("Select a save!"))
+    with t.location(5, 1):
+        echo('\n     '.join(["({0}) - {1}".format(k,v) for k,v in renderable_menu]))
+
+# Get a selection from the user
+    player_path = None
+    while not player_path:
+        with t.location(3, t.height-3):
+            echo("Press a key to choose a save, or press 'q' to quit.")
+        with t.location(1, t.height-2):
+            echo(t.clear_eol())
+            with t.cbreak():
+                c = sys.stdin.read(1)
+        if c not in menu and c not in ['n', 'q']:
+            with t.location(3, t.height-1):
+                echo(c + " is not a valid choice!")
+                continue
+        if c is 'n':
+# Set up a new save file if the user wants one
+            echo(t.clear_eos())
+            with t.location(3, t.height-3):
+                # TODO: Copy the new-game name prompt from CoC classic.
+                echo(t.clear_eol)
+                echo("Beginning a new game! What will we call you?")
+            with t.location(1, t.height-2):
+                name = sys.stdin.readline().strip()
+            if not name:
+                with t.location(3, t.height-1):
+                    echo("Empty names are not allowed!")
+                continue
+            if name in saves['files']:
+                with t.location(3, t.height-1):
+                    echo("A game with that name already exists!")
+                continue
+            player_path = save_path.rstrip('/') + '/' + name + '.csf'
+            saves['files'][name] = player_path
+            with open(save_path + '/saves.yaml' ,'w+') as file:
+                file.write(yaml.dump(saves))
+        elif c == 'q':
+            raise ExitMenuException()
+        else:
+# Load an existing save file
+            player_path = save_path.rstrip('/') + '/' + menu[c] + '.csf'
+
+    return player_path
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-D', '--debug')
+    parser.add_argument('-p', '--player', nargs=1, default=None)
+# TODO: use os.fsencode() or something similar to make path name parsing os-agnostic
+    parser.add_argument('-S', '--save-path', nargs=1, default='~/.coc/')
+    parser.add_argument('--world-schema', nargs=1, default='classic/')
+    args = parser.parse_args(sys.argv[1:])
+
+    try:
+        player = args.save_path + '/' + args.player
+    except TypeError:
+        try:
+            player = select_player(os.path.expanduser(args.save_path))
+        except ExitMenuException:
+            echo(t.exit_fullscreen)
+            sys.exit(0)
+
+    print('\n'.join(dir(coc)))
+    session = coc.Session(world_path=args.world_schema, player_path=player)
