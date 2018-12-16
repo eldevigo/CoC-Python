@@ -1,0 +1,65 @@
+---
+type: event
+id: kiha_event_0
+sequence:
+  - type: render_text
+    text: >-
+      'An imposing figure drops out of the gnarled swamp trees, spraying loam
+      and moss everywhere as it impacts the ground.  You immediately put up your
+      {weapon} and take up a combat stance.  Laughing uproariously, the stranger
+      straightens, tucking her rust-red wings behind her back.  She''s so busy
+      with her mirth that you get a chance to get a good look at the six-foot
+      tall monster of a woman.  Though her face has human-like features, a pair
+      of wicked horns protrude from her forehead, giving evidence to more than a
+      little taint.  The twin spikes match the curve of her skull, the pointed
+      tips sticking out a ways behind her.  Her eyes are nearly solid crimson
+      with inky black slits in the middle.  Dark red scales run up her arms and
+      legs to meet on her back.  A powerful reptilian tail hangs down behind
+      her, whipping back and forth with dangerous strength.'
+  - type: render_text
+    text: >-
+      '"Eyes up here, {gender_slur}" commands the draconic woman - and she''s
+      definitely a woman; the dark-skinned entrance between her muscled legs is
+      evidence enough of that.  She twirls a wicked-looking double-headed axe as
+      she warns, "You seem to have stumbled across my territory.  Let me make
+      this clear to you: I own this stretch of swamp, and if you step foot in
+      this area again, I''m going to beat you until you wish you ran into
+      Lethice herself. Now run along, before you dread the day you met Kiha!"  A
+      thin trail of heat shimmers in the air with each pass of her axe''s
+      blades, left behind by the obviously magical implement.'
+  - type: prompt
+    choices:
+      - label: Fight
+        do_event: kiha_fight_0
+      - label: Ask Why
+      - label: Buy Passage
+      - label: Leave
+parameters:
+  possession_name:
+    tag: weapon
+    ref: primary_weapon
+  match_select:
+    tag: gender_slur
+    ref: gender
+    matches:
+      - ref_match: male
+        val: dick-head
+      - ref_match: female
+        val: slut-bag
+    #default_val: 
+
+---
+type: event
+id: kiha_event_1
+
+---
+type: event
+id: kiha_fight_0
+sequence:
+  - type: render_text
+    text: >-
+      'You step closer and proclaim that you go where you please.  Kiha snorts
+      and says, "Cute.  Sadly, misplaced confidence will only make this hurt
+      that much more."'
+  - type: begin_fight
+    monster: monster_kiha

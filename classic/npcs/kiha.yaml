@@ -1,0 +1,20 @@
+---
+type: npc
+id: npc_kiha
+state:
+  counters:
+    - romance
+    - forest_encounters
+  encounter_event: kiha_event_0
+triggers:
+  - counter_gt:
+      counter: forest_encounters
+      value: '0'
+      set_self:
+        encounter_event: kiha_event_1
+events:
+  - kiha_event_0
+
+---
+type: monster
+id: monster_kiha
