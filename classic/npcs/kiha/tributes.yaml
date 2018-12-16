@@ -1,0 +1,70 @@
+---
+type: event
+id: kiha_tribute_suggested
+sequence:
+  - type: render_text
+    text: >-
+      'You jingle your gem pouch and ask if you could pay her to allow you
+      passage.  Kiha shoulders her axe and scratches at one of her horns,
+      mulling the idea over.  She stops and abruptly shakes her head.  "Not
+      today.  Now scram, before I change my mind!"'
+  - type: set_flag
+    flag_id: considered_tribute
+
+---
+type: event
+id: kiha_tribute_accepted
+sequence:
+  - type: render_text
+    text: >-
+      'Kiha steps out from behind a tree with her axe on her back and her arms
+      folded across her sizable chest.  "You again?  I''ve been thinking about
+      what you said.  How about instead of beating you senseless, you pay me a
+      tribute of 200 gems, and I''ll let you pass through my territory
+      unhindered.  Of course, if you stumble into my lair I might have to teach
+      you a lesson."  A greedy smile spreads across her dusky visage while her
+      eyes burn with mischievous crimson light.  Wait a moment... wasn''t this
+      your idea?'
+
+---
+type: event
+id: kiha_tribute_demanded
+  - type: render_text
+    text: >-
+      'Kiha steps out from behind a tree with her axe on her back and her arms
+      folded across her sizable chest.  "If you want to explore my territory
+      again, you''ll need to pay the fee," she flatly states.  This is absurd -
+      she wants more gems already?  You''ll go broke like this, AND it was your
+      idea to begin with!  What do you do?'
+    if:
+      flag: accepted_tribute
+  - type: set_flag
+    flag_id: accepted_tribute
+  - type: prompt
+    choices:
+      - label: Fight
+        branch: kiha_fight_challenge
+      - label: Pay
+        branch: kiha_tribute_paid
+        requires:
+          resource: gems
+          ge: 200
+        error: "You don't have enough gems!"
+      - label: My Idea
+        branch: kiha_fight_questioned
+      - label: Leave
+        branch: kiha_fight_avoid
+
+---
+type: event
+id: kiha_tribute_paid
+sequence:
+  - type: render_text
+    text: >-
+      'You sigh and pay her 200 gems.  She doesn''t even mention that it was
+      originally your idea, but still, you''re getting what you want - the
+      ability to explore her territory unhindered.  Of course, you have no idea
+      how long this 200 gems will last.'
+  - type: modify_resource
+    res: gems
+    subtract: 200

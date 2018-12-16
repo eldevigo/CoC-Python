@@ -1,0 +1,55 @@
+Scenes are stored as a list of sequence_elements. Currently used sequence_elements and their parameters are:
+
+render_text:
+  text (str) <required>
+  if (condition)
+
+modify_resource:
+  res: (string:resource_id) <req>
+  set: (int)
+  subtract: (int)
+  add: (int)
+
+set_flag:
+  flag_id: (string:flag_id) <req>
+  if (condition)
+
+clear_flag:
+  flag_id: (string:flag_id) <req>
+  if (condition)
+
+begin_fight:
+  monster_id (str:monster_id) <required>
+
+prompt:
+  choices (list:choices) <required>
+
+branch:
+  event_id (str:event_id) <req>
+  if (condition)
+
+change_npc_encounter:
+  npc_id (str:npc_id) <req>
+  encounter_id (str:encounter_id) <req>
+  if (condition)
+
+The data structures referenced above include:
+
+choices:
+  label (string) <required>
+  branch (string:event_id) <required>
+  requires (condition)
+  error (string) # message printed when the choice is selected if condition exists and is not met
+
+condition:
+  resource: (string:resource_id)
+  flag: (string:flag_id)
+  ge: (int)
+  gt: (int)
+  le: (int)
+  lt: (int)
+  eq: (int)
+  not: (condition)
+  all: (list:condition)
+  any: (list:condition)
+  chance_in: (int) # used for randomized 1-in-n chances
