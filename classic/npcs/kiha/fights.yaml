@@ -1,0 +1,91 @@
+---
+type: event
+id: kiha_fight_avoid
+sequence:
+  - type: render_text
+    text: >-
+      'You nod and step back, retreating back towards camp.  You''ve no desire
+      to fight such a fiery opponent.'
+
+---
+# Lead-in to a fight if you challenge kiha on your first encounter
+type: event
+id: kiha_fight_challenge
+sequence:
+  - type: render_text
+    text: >-
+      'You step closer and proclaim that you go where you please.  Kiha snorts
+      and says, "Cute.  Sadly, misplaced confidence will only make this hurt
+      that much more."'
+  - type: begin_fight
+    monster_id: monster_kiha
+
+---
+# Lead-in to a fight if you question kiha on your first encounter
+type: event
+id: kiha_fight_defensive
+sequence:
+  - type: render_text
+    text: >-
+      'You ask why she''s trying to drive you off.  Confusion breaks out across
+      Kiha''s brow for a moment before her visage hardens back into a confident
+      sneer.  "I don''t need to explain myself to you.  I was strong enough to
+      break out of Lethice''s base, and I''ve been strong enough to murder every
+      lackey she''s sent after me."'
+  - type: render_text
+    text: >-
+      'Thinking you may have found a way to win into the powerful warrior''s
+      good graces, you start to explain that your whole purpose here is to
+      defeat the demon queen.  She cuts you off by exhaling a whirling tornado
+      of fire into the air.  The scorching inferno seems to suck the very breath
+      from your lungs, robbing you of your words.  While the after-image still
+      hangs in your vision, she declares, "I don''t give two licks about why
+      you''re here.  I''m gonna beat your ass just for wasting my time!"'
+  - type: begin_fight
+    monster_id: monster_kiha
+
+---
+type: event
+id: kiha_fight_reprisal
+sequence:
+  - type: render_text
+    text: >-
+      'Kiha plummets from the sky, slamming down into the mossy earth with
+      enough force to spray chunks of dirt everywhere.  She stands and growls,
+      "Just because you beat me before doesn''t mean you''ve defeated me.
+      I''ll NEVER BE DEFEATED!"'
+  - type: render_text
+    text: >-
+      'As she screams out in defiance, she charges you, giving you barely enough
+      time to ready yourself for combat!'
+  - type: begin_fight
+    monster_id: monster_kiha
+
+---
+type: event
+id: kiha_fight_questioned
+sequence:
+  - type: render_text
+    text: >-
+      'You ask why she changed her mind about your idea.  Kiha''s face screws up
+      for a moment, her chocolate-hued visage distorting into an irritated
+      grimace.  This may have been a mistake.  She screams, "As if someone like
+      you would have an idea worthy of being adopted by me!  I forgot about your
+      insignificant offer as soon as I was away from you.  This tribute was
+      devised solely with my own sizable wit and cunning!"'
+  - type: render_text
+    text: >-
+      'The dragon-girl yanks her axe from her back and twists her hands, making
+      the edge glow orange in the murky swamp air.  "You should''ve kept your
+      mouth shut, worm.  The offer is off the table now!  The only thing I''ll
+      trade you is pain!"'
+  - type: begin_fight
+    monster_id: monster_kiha
+
+---
+type: event
+id: kiha_fight_begin
+sequence:
+  - type: clear_flag
+    flag_id: pc_won_last_fight
+    flag_owner: npc_kiha

@@ -1,0 +1,346 @@
+---
+type: event
+id: kiha_defeat_behavior
+sequence:
+  - type: set_flag
+    flag_id: pc_won_last_fight
+    flag_owner: npc_kiha
+  - type: render_text
+    text: >-
+      "Kiha sways back and forth for a moment, then drops her axe with numb
+      hands.  As soon as she does, the hot glow of the weapon's cutting edge
+      fades to silver, and the weapon lands with a heavy 'thunk'{like} in the
+      dirt.  The dragoness drops to her knees and slumps back against a tree,
+      her limbs trembling {thusly} as she tries to rise."
+  - type: render_text
+    text: >-
+      '"You... can''t make me like it!," she shouts, struggling with all her
+      might to keep her hands away from her genitals.  Somehow, she seems to be
+      managing."'
+    if:
+      resource: lust
+      ge: 100
+  - type: render_text
+    text: >-
+      '"You... you... haven''t... beaten me," she mutters, even though it''s
+      quite clear that you have.'
+    if:
+      resource: lust
+      lt: 100
+  - type: render_text
+    text: >-
+      '  What do you do with the wannabe dragon now that you''ve taken her down
+      a peg?'
+  - type: render_text
+    text: >-
+      'You could forcibly masturbate her.'
+  - type: render_text
+    text: >-
+      'You could use her tail as a dildo.'
+    if:
+      - pc: is_horny
+      - pc: has_vagina
+  - type: render_text
+    text: >-
+      'You could fuck her vagina{and_ass}.'
+    if:
+      - pc: is_horny
+      - pc: is_piv_compatible
+        entity: kiha_npc
+  - type: render_text
+    text: >-
+      'Now that she''s a captive audience, you could always talk to her.'
+  - prompt:
+    choices:
+      - label: Masturbate
+        branch: kiha_defeat_masturbate
+      - label: Use Tail
+        branch: kiha_defeat_tail
+        requires:
+          - pc: has_vagina
+          - pc: is_horny
+      - label: Fuck Her Pussy
+        branch: kiha_defeat_piv
+        requires:
+          - pc: is_horny
+          - pc: is_piv_compatible
+            entity: kiha_npc
+      - label: Fuck Her Ass
+        branch: kiha_defeat_pia
+        requires:
+          - pc: is_horny
+          - pc: is_pia_compatible
+            entity: kiha_npc
+      - label: Talk
+        branch: kiha_defeat_talk
+parameters:
+  - type: modal
+    key: like
+    condition:
+      game: silly
+    val: " (like Urta's cock!)"
+  - type: modal
+    key: thusly
+    condition:
+      resource: lust
+      entity: npc_kiha
+      ge: 100
+    val: 'with lust'
+    alt: 'weakly'
+  - type: modal
+    key: and_ass
+    condition:
+      pc: is_p2ia_compatible
+      entity: kiha
+    val: ' and ass'
+
+---
+type: event
+id: kiha_defeat_masturbate
+sequence:
+  - type: render_text
+    text: >-
+      'You walk towards the draconic woman, removing your {armor} as you observe
+      her firm, {attitude} figure slumping against the weathered bark behind
+      her.  She eyes you carefully, trying to comprehend the situation before
+      catching note of your {genitals}.'
+  - type: render_text
+    text: >-
+      '"{bluster}"  Today, however, you don''t have any plans to fuck her
+      directly{sadtrombone}.  Without saying a word, you walk behind her,
+      slouching in between the tree and her warm figure as you scoot yourself
+      closer.  She desperately tries to turn around to look behind her, but she
+      appears to be too weak to even move her neck.  In only moments, you''ve
+      managed to lay against the tree, with the feeble dragon-girl sitting down
+      comfortably on your lap - {taller}.  The dragoness attempts to struggle
+      against you, but she''s far too enervated to move.  "What are you doing?
+      I don''t fucking understand you!  What are yo-" before she can continue to
+      berate you, you cut her off by moving her head towards your own and
+      kissing her firmly on the lips.  Her eyes widen in surprise, but soon
+      lower as she begins to reciprocate the notion.  You lock lips for what
+      seems like ages, long enough that when you part, a single rope of saliva
+      remains, connecting the two of you together.'
+  - type: render_text
+    text: >-
+      'The girl tries to speak, but you reach down towards her nether region,
+      placing two fingers along the smooth of her belly and slowly creeping
+      lower and lower, eliciting a small gasp from your victim as you reach her
+      moist entrance.  She manages to reach out and grasp your hand, tensing as
+      you begin to stroke her wetness, already lubricated by her juices.  You
+      chuckle, announcing that she must''ve been turned on by the kiss - if she
+      wasn''t wet already, she sure as hell is now.  "N-no!  You''re... you''re
+      wrong..." the dragon-girl stammers, though she finds herself unable to
+      continue while you increase the speed of your heavy petting.  The draconic
+      woman is a slave to your nimble fingers, with any attempt to stifle her
+      moans ultimately failing as an odd yelp or gasp escapes her pouting lips.
+      With a gentle push you enter inside her, your panting toy clamping her
+      legs shut against your probing fingers.'
+  - type: render_text
+    text: >-
+      'You notice the dragon-girl''s warm breath pervade the air as you feel the
+      warmth of her insides, her slick tongue beginning to drool out of her
+      mouth from the sensation of her moist lips being invaded by your stern
+      hand.  The aroused state of her nipples poking up into the humid air give
+      you an idea, as you take your free hand and begin to grope and massage the
+      breasts in between your fingers.  The teats perk to your ministrations
+      while you roughly squeeze her heaving bosom, almost as if to milk her like
+      a cow.  A grunt escapes your lips as you rub your {area}{conclusion}.
+      You increase the pace of your movements, plunging your fingers in and out
+      of her dripping pussy while your free hand tweaks and rubs the hardened
+      button of one of her cushiony breasts.  The dragoness squirms and
+      convulses underneath your touch, biting her lip while she becomes a slave
+      to your manipulations.  "I... I''m not enjoying this... n-not with someone
+      like you!" she manages to growl, her admirable resistance only giving you
+      the desire to plunge her further into a world of pleasure.  You fit a
+      third finger into her tight hole, the heat of her walls clenching against
+      you like a velvet furnace.  You reach down and kiss her a second time,
+      deciding to go about it more passionately as you probe your tongue inside,
+      wrapping it around her own.'
+  - type: render_text
+    text: >-
+      'There''s nothing your hot and bothered slave can do outside of melting
+      underneath the heat of your own body, the irony of the dragon-girl losing
+      in a game of passions lost in the rough, commanding movements of your
+      hands and the taste of her plush lips against your own.  You''re
+      intertwined as a single being of pure lust under the shade of the tree,
+      which ends as soon as it began when the draconic beast-girl shudders in
+      pleasure, signalling her release.'
+  - type: render_text
+    text: >-
+      'Her moist juices flush from beneath her, drenching your fingers in her
+      essence.  She slowly removes her lips from yours, moving closer towards
+      you{dick_touch}.  The girl sighs in relief, tuckered out more from the
+      sensual experience than the battle itself.  You slowly remove yourself,
+      leaving the tired girl underneath the tree to rest.'
+  - type: pc_event
+    event: orgasm
+    if:
+      pc: has_dick
+  - type: render_text
+    text: >-
+      '"I... hate you... " she whispers, before turning in for a deep slumber.
+      You watch her soft face as she snores, graceful as a pig, before walking
+      back to camp.'
+  - type: modify_resource
+    entity: _pc
+    res: lust
+    add: 100
+    if:
+      not:
+        pc: has_dick
+parameters:
+  - type: possession_name
+    key: armor
+    ref: armor
+  - type: modal
+    key: attitude
+    if:
+      resource: lust
+      entity: npc_kiha
+      ge: 100
+    val: 'wanton'
+    else: 'but disspirited'
+  - type: modal
+    key: genitals
+    if:
+      not:
+        pc: is_neuter
+    val: 'aroused genitals'
+    else: 'distinct lack of genitals'
+  - type: first_match
+    key: bluster
+    cases:
+      - if:
+          pc: is_neuter
+        val: >-
+          '"H-huh?  Why the hell are you coming closer?  How can you possibly do
+          anything when you''re as smooth as a board down there, you loser!"'
+      - if:
+        - pc: has_dick
+        - not:
+            pc: has_vagina
+        val: >-
+          '"G-get that away from me!  As if I''d want anything to do with your
+          hard, juicy cock!  Idiot!"'
+      - if:
+        - pc: has_vagina
+        - not:
+            pc: has_dick
+        val: >-
+          '"What do you think you''re going to do with that pathetic, dripping
+          pussy, huh?  I swear, if you make me l-lick that thing..."'
+    default: >-
+      '"W-what are you going to do, you freak of nature?  If you make me
+      play with those, I swear... I swear I''ll hit you!"'
+  - type: modal
+    key: sadtrombone
+    if:
+      pc: is_neuter
+    val: >-
+      ', and seeing as you don''t have anything to fuck her with, it''s not like
+      you could'
+  - type: modal
+    key: taller
+    if:
+      pc: taller_than
+      args: [71]
+    val: 'though you''re much taller than her'
+    else: 'though you''re hidden behind her tallness'
+  - type: indirect_modal
+    key: area
+    entity: _pc
+    if:
+      pc: has_dick
+    ref: dick_desc_brief_all
+    else: nipple_desc
+  - type: first_match
+    key: conclusion
+    cases:
+      - if:
+          pc: has_multiple_dicks
+        val: >-
+          ' against her soft flesh, a small bead of pre-cum forming from the tip
+          and slathering her back with your juices'
+      - if:
+          pc: has dick
+        val: >-
+          ' against her soft flesh, small beads of pre-cum forming from the tips
+          and slathering her back with your juices'
+    default: >-
+      's against the hard ridges of her back, your tongue softly licking her
+      smooth skin'
+  - type: modal
+    key: dick_touch
+    if:
+      pc: has_dick
+    val: ' and accidentally brushing against your trembling genitals, pushing
+    you hard enough to cause you to ejaculate against her backside'
+
+---
+type: event
+id: kiha_defeat_tail
+sequence:
+  - type: render_text
+    text: >-
+      'You approach the {attitude} dragoness full of wicked ideas.  For her
+      part, she looks up at you with a defiant gaze, as if it would somehow
+      dissuade you from the sexual thoughts now guiding your body.  You circle
+      to the side and reach down, grabbing her wriggling tail with both hands.
+      Kiha tries to pull it out of your hands, but in her weakened state, all it
+      does is weakly flop like a caught fish.  Laughing, you smack her in the
+      face with her own scaly hind-bits before you drop it.  You know just how
+      you''ll put that rudder to use, but first you''ve got to shuck your
+      {armor}."'
+  - type: render_text
+    text: >-
+      'The gear lands behind you in a bed of moss{silly}  Now nude, you sway
+      your {hips} back and forth sensually, forcing Kiha to watch your body
+      before you use her.  {taunt}  You tire of her constant insults and
+      inability to face facts.  A-ha!  You grab your underwear and ball it up,
+      noting the pungent smell of your sweat and sex.  The scaly slut recoils,
+      but you close in and stuff the musky undergarments in her mouth, ignoring
+      her struggles as you grab some vines and bind her arms.  Perfect!'
+
+parameters:
+  - type: modal
+    key: attitude
+    if:
+      resource: lust
+      entity: npc_kiha
+      ge: 100
+    var: 'lusty'
+    else: 'wounded'
+  - type: possession_name
+    key: armor
+    ref: armor
+  - type: modal
+    key: silly
+    if:
+      game_flag: silly
+    var: ' with a pomf =3'
+    else: '.'
+  - type: reference
+    key: hips
+    ref: hip_desc
+  - type: first_match
+    key: taunt
+    cases:
+      resource: 
+
+---
+type: event
+id: kiha_defeat_piv
+sequence:
+  - asdf
+
+---
+type: event
+id: kiha_defeat_pia
+sequence:
+  - asdf
+
+---
+type: event
+id: kiha_defeat_talk
+sequence:
+  - asdf

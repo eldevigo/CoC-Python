@@ -1,0 +1,7 @@
+---
+type: event
+id: kiha_fight_victory
+sequence:
+  - type: render_text
+    text: >-
+

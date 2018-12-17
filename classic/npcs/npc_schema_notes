@@ -9,6 +9,7 @@ modify_resource:
   set: (int)
   subtract: (int)
   add: (int)
+  entity: (str:entity_id)
 
 set_flag:
   flag_id: (string:flag_id) <req>
@@ -42,14 +43,21 @@ choices:
   error (string) # message printed when the choice is selected if condition exists and is not met
 
 condition:
-  resource: (string:resource_id)
-  flag: (string:flag_id)
+    (references)
+  resource: (string:resource_id) # checks for a matching resource on an active entity
+  pc: (string:pc_flag_id) # queries the PC state interface for a boolean value
+  game: (string:flag_id) # references the world's state flags
+  flag: (string:flag_id) # checks for a matching state flag on an active entity
+    (conditions) <requires resource reference>
   ge: (int)
   gt: (int)
   le: (int)
   lt: (int)
   eq: (int)
+    (boolean groupings)
   not: (condition)
   all: (list:condition)
   any: (list:condition)
+    (misc)
   chance_in: (int) # used for randomized 1-in-n chances
+  entity: (string:entity_id) # overrides the entity checked by flag and resource

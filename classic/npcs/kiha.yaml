@@ -3,18 +3,19 @@ type: npc
 id: npc_kiha
 state:
   counters:
-    - romance
+    - reputation
     - forest_encounters
-  encounter_event: kiha_event_0
-triggers:
-  - counter_gt:
-      counter: forest_encounters
-      value: '0'
-      set_self:
-        encounter_event: kiha_event_1
-events:
-  - kiha_event_0
+    - tribute_duration
+  flags:
+    - pc_won_last_fight
+    - considered_tribute
+    - accepted_tribute
+  encounter_event: kiha_first_encounter
+load_events: 'kiha/*.yaml'
 
 ---
 type: monster
 id: monster_kiha
+fight_event: kiha_fight_begin
+victory_event: kiha_victory_behavior
+defeat_event: kiha_defeat_behavior

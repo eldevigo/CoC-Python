@@ -1,7 +1,10 @@
 ---
 type: event
-id: kiha_event_0
+id: kiha_first_encounter
 sequence:
+  - type: change_npc_encounter
+    npc_id: npc_kiha
+    encounter_id: kiha_forest_behavior
   - type: render_text
     text: >-
       'An imposing figure drops out of the gnarled swamp trees, spraying loam
@@ -30,36 +33,99 @@ sequence:
   - type: prompt
     choices:
       - label: Fight
-        do_event: kiha_fight_0
+        branch: kiha_fight_challenge
       - label: Ask Why
+        branch: kiha_fight_defensive
       - label: Buy Passage
+        branch: kiha_tribute_suggested
       - label: Leave
+        branch: kiha_fight_avoid
 parameters:
-  possession_name:
-    tag: weapon
+  - type: possession_name
+    key: weapon
     ref: primary_weapon
-  match_select:
-    tag: gender_slur
-    ref: gender
-    matches:
-      - ref_match: male
-        val: dick-head
-      - ref_match: female
-        val: slut-bag
-    #default_val: 
+  - type: modal
+    key: gender_slur
+    condition:
+      pc: has_dick
+    val: 'dick-head'
+    alt: 'slut-bag'
 
 ---
 type: event
-id: kiha_event_1
-
----
-type: event
-id: kiha_fight_0
+id: kiha_forest_encounter
 sequence:
   - type: render_text
     text: >-
-      'You step closer and proclaim that you go where you please.  Kiha snorts
-      and says, "Cute.  Sadly, misplaced confidence will only make this hurt
-      that much more."'
-  - type: begin_fight
-    monster: monster_kiha
+      'A nearby tree suddenly explodes in a shower of splintering wood and
+      burning embers.  Kiha steps through the wreckage with her characteristic
+      double-sided axe.'
+  - type: render_text
+    text: >-
+      '"Don''t even start," she commands, advancing on you as she continues, "I
+      told you to avoid my domain and yet you ignored my imperative and
+      returned.  You may be a fucking masochist or a retard, but trust me, you
+      won''t enjoy this."'
+  - type: branch
+    event_id: kiha_fight_challenge
+    if:
+      flag: tribute_suggested
+  - type: render_text
+    text: 'If you hurry, you might get a word in edge-wise.  What do you do?'
+  - type: prompt
+    choices:
+      - label: Fight
+        branch: kiha_fight_challenge
+      - label: Ask Why
+        branch: kiha_fight_defensive
+      - label: Buy Passage
+        branch: kiha_tribute_suggested
+      - label: Leave
+        branch: kiha_fight_avoid
+
+---
+type: event
+id: kiha_forest_behavior
+sequence:
+  - type: branch
+    event_id: kiha_
+    if:
+  - type: branch
+    event_id: kiha_stays_away
+    if:
+      resource: tribute_duration
+      gt: 1
+  - type: branch
+    event_id: kiha_fight_reprisal
+    if:
+      flag: pc_won_last_fight
+  - type: branch
+    event_id: kiha_tribute_accepted
+    if:
+      - flag: considered_tribute
+      - not:
+          flag: accepted_tribute
+      - chance_in: 2
+  - type: branch
+    event_id: kiha_tribute_demanded
+    if:
+      - flag: accepted_tribute
+      - any:
+        - resource: tribute_duration
+          eq: 1
+        - all:
+          - resource: tribute_duration
+            eq: 0
+          - chance_in: 2
+  - type: branch
+    event_id: kiha_forest_encounter
+
+---
+type: event
+id: kiha_stays_away
+sequence:
+  - type: modify_resource
+    res: tribute_duration
+    subtract: 1
+  - type: 
+
