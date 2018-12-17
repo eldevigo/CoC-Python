@@ -16,19 +16,19 @@ class Player(Immutable):
 def load(path):
     """ A factory function that loads a Player object from a file path.
     """
-    try:
-        with open(path, 'r') as file:
-            player = yaml.load(file.read())
-    except FileNotFoundError:
-        pass
+    with open(path, 'r') as file:
+        player = yaml.load(file.read())
+    return Player(player)
+
+
 def create(name, world, interface):
     """ A factory function that creates a new player object from parameters and
     a world object.
     """
-    race = interface.selection_prompt(title='What race are you?',
+    race = interface.menu_choice(title='What race are you?',
             options=['human',
                 'orc',
                 'elf'
                 ]
         )
-    return Player(name, world.id, **world.state_object())
+    return Player(name, world.id, **world.get_state_template())

@@ -9,10 +9,14 @@ class Immutable(COCClass):
     """ Common base class for CoC subclasses that have properties which are
     immutable after being initialized (i.e. most of them)
     """
-    def __setitem__(self, key, value):
+    def __init__(self):
+        super().__setattr__('initialized', False)
+        self.immutable = list()
+
+    def __setattr__(self, key, value):
         if self.initialized and key not in self.mutable:
             raise ImmutablePropertyError(self.__class__.__name__, key)
         else:
-            super().__setitem__(self, key, value)
+            super().__setattr__(key, value)
 
 from coc.session import Session

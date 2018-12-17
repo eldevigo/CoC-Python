@@ -1,3 +1,5 @@
+import os
+
 from coc import COCClass
 from coc import world
 from coc import player
@@ -7,16 +9,17 @@ class Session(COCClass):
     bind a Player and a World object to the interface so that they may be
     interacted with by a human.
     """
-    def __init__(self, world_path, player_path):
+    def __init__(self, world_path, player_path, interface):
         self.world = world.load(world_path)
         self.player_file = player_path
+        self.interface = interface
         try:
             self.player = player.load(player_path)
-            if player.world_id != world.id:
+            if self.player.world_id != world.id:
                 raise LoadError("Save file does not match the selected world!")
         except FileNotFoundError:
-            player_name = os.path.split(os.path.splitext(path)[0])[-1]
-            self.player = player.create(name=player_name, world=self.world)
+            player_name = os.path.split(os.path.splitext(player_path)[0])[-1]
+            self.player = player.create(name=player_name, world=self.world, interface=interface)
 
     def save(self, save_path=None):
         try:

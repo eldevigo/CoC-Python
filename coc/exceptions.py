@@ -1,7 +1,7 @@
 class COCException(Exception):
     """ Parent class for all coc-secific exception types
     """
-    def __init__(self, msg=None):
+    def __init__(self, msg=None, **kwargs):
         super().__init__(msg)
 
 class LoadError(COCException):
@@ -10,7 +10,13 @@ class LoadError(COCException):
     def __init__(self, msg=None):
         super().__init__(msg)
 
-class ExitMenuException(COCException):
+class InterfaceException(COCException):
+    """
+    """
+    def __init__(self, msg=None):
+        super().__init__(msg)
+
+class ExitMenuException(InterfaceException):
     """ Exception type for backing out of a menu
     """
     def __init__(self, msg=None):
@@ -28,3 +34,15 @@ class ImmutablePropertyError(NotPermittedError):
     """
     def __init__(self, attr, classname):
         super().__init__("``{0}.{1}`` is immutable after initialization")
+
+class SchemaError(COCException):
+    """ Generic error for syntactic or structural issues with the world schema
+    """
+    def __init__(self, msg=None, **kwargs):
+        super().__init__(msg)
+
+class EntityNotFoundError(SchemaError):
+    """ Raised when a request to the entity registry fails to find something
+    """
+    def __init__(self, msg=None, **kwargs):
+        super().__init__(msg)
