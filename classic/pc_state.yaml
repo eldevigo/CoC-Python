@@ -1,0 +1,8 @@
+---
+type: pc
+state:
+  flags:
+    - is_dead
+  counters:
+    - gems
+

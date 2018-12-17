@@ -1,6 +1,7 @@
 ---
 type: npc
 id: npc_kiha
+name: Kiha
 state:
   counters:
     - reputation
@@ -16,6 +17,8 @@ load_events: 'kiha/*.yaml'
 ---
 type: monster
 id: monster_kiha
-fight_event: kiha_fight_begin
-victory_event: kiha_victory_behavior
-defeat_event: kiha_defeat_behavior
+name: Kiha
+state:
+  encounter_event: kiha_fight_begin
+  victory_event: kiha_victory_behavior
+  defeat_event: kiha_defeat_behavior
