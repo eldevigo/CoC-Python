@@ -29,3 +29,5 @@ if __name__ == '__main__':
             sys.exit(0)
 
     session = coc.Session(world_path=args.world_schema, player_path=player_path, interface=interface)
+    session.begin()
+    print('Session terminated!')

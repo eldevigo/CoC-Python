@@ -1,46 +1,134 @@
 import sys
+import textwrap
+import curses
 from blessed import Terminal
 
 from coc.exceptions import *
 
 t = Terminal()
+w = textwrap.TextWrapper(fix_sentence_endings = True)
+_pause_sequence = False
+in_fullscreen = True
+offset = 0
+window_height = 0
+window_width = 0
+_screenbuffer = ''
 
-def fullscreen(func):
+def _fullscreen(func):
     def _decorator(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except InterfaceException:
-            _echo(t.exit_fullscreen)
+            if in_fullscreen:
+                _echo(t.exit_fullscreen)
+                in_fullscreen = False
             raise
     return _decorator
+
+def _get_geometry():
+    global window_height
+    global window_width
+    window_height = t.height - 6
+    window_width = t.width - 4
+    w.width = window_width
+
+def _sequenced(func):
+    def _decorator(*args, **kwargs):
+        global _pause_sequence
+        if _pause_sequence:
+            _get_geometry()
+            with t.location(0,0):
+                with t.cbreak():
+                    sys.stdin.read(1)
+        _pause_sequence = True
+        return func(*args, **kwargs)
+    return _decorator
+
+def _break_sequence(func):
+    def _decorator(*args, **kwargs):
+        _pause_sequence = False
+        return func(*args, **kwargs)
+    return _decorator
+
+def _dump_buffer(func):
+    def _decorator(*args, **kwargs):
+        global _screenbuffer
+        global offset
+        _screenbuffer = ''
+        offset = 0
+        return func(*args, **kwargs)
+    return _decorator
+
+def _clean_up_errors(func):
+    def _decorator(*args, **kwargs):
+        ret = func(*args, **kwargs)
+        with t.location(3,t.height-1):
+            _echo(t.clear_eol)
+        return ret
+    return _decorator
+
 
 class Interface:
     """ Provides an API to interact through a terminal interface with a user
     """
     def __init__(self):
         _echo(t.enter_fullscreen)
-        self._get_geometry()
+        _get_geometry()
 
-    @fullscreen
+    @_fullscreen
+    @_dump_buffer
+    def clear(self):
+        return self.blank_window()
+
+    @_fullscreen
+    @_break_sequence
+    def blank_window(self):
+        lines = window_height
+        with t.location(3,lines):
+            while lines:
+                _echo(t.clear_eol)
+                t.move_y(lines)
+                lines -= 1
+
+    @_fullscreen
     def error(self, text):
         with t.location(3, t.height-1):
             _echo(t.clear_eol())
             _echo(text)
 
-    @fullscreen
-    def prompt(self, text):
-        with t.location(3, t.height-3):
-            _echo(t.clear_eol())
-            _echo(text)
-
-    @fullscreen
+    @_fullscreen
     def title(self, text):
         with t.location(3, 0):
             _echo(t.clear_eol())
             _echo(t.bold(text))
 
-    @fullscreen
-    def menu_choice(self, options, title=None):
+    @_fullscreen
+    def prompt(self, text):
+        with t.location(3, t.height-3):
+            _echo(t.clear_eol())
+            _echo(text)
+
+    @_fullscreen
+    @_sequenced
+    def print(self, text=None):
+        if text:
+            _screenbuffer = _screenbuffer + '\n\n' + text
+        lines = list()
+        for line in _screenbuffer.splitlines():
+            lines.extend(w.wrap(line))
+        y = 2
+        for item in lines[offset:window_height+offset]:
+            with t.location(x=3,y=y):
+                _echo(t.clear_eol)
+                _echo(item)
+            y +=1
+
+    @_fullscreen
+    @_break_sequence
+    @_sequenced
+    @_dump_buffer
+    @_clean_up_errors
+    def menu_choice(self, options, prompt=None):
         def draw_menu(renderable):
             rendered = [
                     '({0}) - {1}'.format(a,b)
@@ -49,30 +137,31 @@ class Interface:
                     ]
             self.prompt('Press a key to select. q to quit, - to scroll up, + to'
                             'scroll down.')
-            y = 1
+            y = 2
             for item in rendered:
                 with t.location(x=5,y=y):
                     _echo(t.clear_eol)
                     _echo(item)
-                    y +=1
-        if title:
-            self.title(title)
-        offset = 0
+                y +=1
+        global offset
+        global window_height
+        if prompt:
+            self.title(prompt)
         selection_keys = '0123456789abcdefghijklmnoprstuvwxyz'
         renderable = list(zip(selection_keys,
-            options[offset:self.window_height+offset]))
+            options[offset:window_height+offset]))
         draw_menu(renderable)
         selection = None
         while True:
             c = self.get_char()
             if c == '+':
                 offset += 3
-                if offset > len(options) - self.window_height:
-                    offset = len(options) - self.window_height
+                if offset > len(options) - window_height:
+                    offset = len(options) - window_height
                 if offset < 0:
                     offset = 0
                 renderable = list(zip(selection_keys,
-                    options[offset:self.window_height+offset]))
+                    options[offset:window_height+offset]))
                 draw_menu(renderable)
                 continue
             if c == '-':
@@ -80,7 +169,7 @@ class Interface:
                 if offset < 0:
                     offset = 0
                 renderable = list(zip(selection_keys,
-                    options[offset:self.window_height+offset]))
+                    options[offset:window_height+offset]))
                 draw_menu(renderable)
                 continue
             if c == 'q':
@@ -90,38 +179,89 @@ class Interface:
             except KeyError as e:
                 self.error("({0}) is not a valid choice!".format(e.args[0]))
 
-    @fullscreen
-    def clear_window(self):
-        lines = self.window_height
-        with t.location(3,lines):
-            while lines:
-                _echo(t.clear_eol)
-                t.move_y(lines)
-                lines -= 1
+    @_fullscreen
+    @_break_sequence
+    @_clean_up_errors
+    def boolean_choice(self, prompt=None, title=None):
+        if title:
+            self.title(title)
+        self.clear()
+        self.prompt("Press (y) or (n) to choose.")
+        self.print(prompt)
+        while True:
+            b = self.get_char()
+            if b == 'y':
+                return True
+            if b == 'n':
+                return False
+            self.error('``{0}`` is not a valid choice!'.format(b))
 
-    @fullscreen
-    def get_char(self):
-        with t.location(1, self.window_height+3):
+    @_fullscreen
+    @_break_sequence
+    @_dump_buffer
+    def get_char(self, prompt=None, title=None):
+        if prompt:
+            self.prompt(prompt)
+        if title:
+            self.title(title)
+        with t.location(1, window_height+4):
             _echo(t.clear_eol())
             with t.cbreak():
-                c = sys.stdin.read(1)
+                c = t.inkey()
         return c
 
-    @fullscreen
-    def get_line(self):
-        with t.location(1, self.window_height+3):
+    @_fullscreen
+    @_break_sequence
+    @_dump_buffer
+    def get_line(self, prompt=None, title=None):
+        if prompt:
+            self.prompt(prompt)
+        if title:
+            self.title(title)
+        with t.location(1, window_height+4):
             _echo(t.clear_eol())
-            line = sys.stdin.readline().strip()
+            line = input()
         return line
 
-    def _get_geometry(self):
-        self.window_height = t.height - 5
+    @_fullscreen
+    @_break_sequence
+    @_dump_buffer
+    @_clean_up_errors
+    def get_quantity(self, max, min, float=False, autoround=True, prompt=None, title=None):
+        try:
+            max = float(max) if float else int(max)
+            min = float(min) if float else int(min)
+        except ValueError as e:
+            raise InterfaceException("requested a quantity with non-numeric"
+                    " value bounds (value was {0})".format(str(e.args[0])))
+        if prompt:
+            self.prompt(prompt)
+        if title:
+            self.title(title)
+        while True:
+            with t.location(1, window_height+4):
+                _echo(t.clear_eol())
+                q = sys.stdin.readline().strip()
+                try:
+                    q = float(q) if float else int(q)
+                except ValueError:
+                    self.error("That's not a number!")
+                    continue
+            if q > max:
+                if autoround:
+                    return max
+                else:
+                    self.error("Too high! Maximum value is {0}".format(str(max)))
+            if q < min:
+                if autoround:
+                    return min
+                else:
+                    self.error("Too low! Minimum value is {0}".format(str(min)))
+            return q
 
 def _echo(text):
     """Display ``text`` and flush output."""
     sys.stdout.write(u'{}'.format(text))
     sys.stdout.flush()
-
-
 
 interface = Interface()

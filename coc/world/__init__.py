@@ -44,7 +44,7 @@ class World(Immutable):
         ret = {
                 'entities': {e.id: copy.deepcopy(e.state) for e in entity.get_all()},
                 'locales': {l.id: copy.deepcopy(l.state) for l in locale.get_all()},
-                'self': copy.deepcopy(self.pc_template)
+                'pc': copy.deepcopy(self.pc_template)
                 }
         return ret
 
@@ -68,7 +68,7 @@ class World(Immutable):
 
     def _load_pc_template(self, schema):
         try:
-            self.pc_template = schema['state']
+            self.pc_template = schema
         except KeyError as e:
             raise SchemaError('pc state template missing required section '
                     '``state``', schema=schema) from e

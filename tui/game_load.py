@@ -21,9 +21,8 @@ def select_player(save_path):
     menu = list(saves['files'].keys())
     menu.insert(0, '< new game >')
     while True:
-        save_name = i.menu_choice(menu, title="Select a save!")
+        save_name = i.menu_choice(menu, prompt="Select a save!")
         if save_name == '< new game >':
-            i.clear_window()
             i.prompt("Beginning a new game! What will we call you?")
             name = i.get_line()
             if not name:

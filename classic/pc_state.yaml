@@ -1,8 +1,39 @@
 ---
 type: pc
-state:
+defaults:
   flags:
-    - is_dead
+    - found_tel_adre
   counters:
-    - gems
-
+    - corruption
+  numbers:
+    - lust_resistance
+  strings:
+    - honorary
+statics:
+  flags:
+    is_virgin: true
+  counters:
+    gems: 10
+  numbers:
+    body_temperature: 98.5
+  strings:
+    camp_adjective: "dusty"
+choices:
+  flags:
+    colorblind:
+      prompt: "Are you colorblind?"
+  counters:
+  numbers:
+  strings:
+    hair_color:
+      prompt: "Choose your hair color"
+      choices:
+        - white
+        - blond
+        - sandy
+        - brunette
+        - black
+        - red
+        - purple
+        - blue
+        - green
