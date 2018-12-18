@@ -2,8 +2,6 @@
 
 This is a ground-up rewrite of the original (pre-mod) Corruption of Champions game. If you are unfamiliar with the game, caveat emptor: this is strictly adult entertainment. The game content, and thus the source, contains lots of very explicit and vulgar content. Not suitable for children, workplaces, or people with good taste.
 
-If you are interested in this rewrite, either as a user or a contributor, read on!
-
 
 ## Project goals
 
@@ -22,7 +20,8 @@ Installing and running on Linux should be as simple as following these steps. Co
 - If you don't have Python 3, please install Python 3 and Pip 3. I recommend the [Python Foundation Installation Guide](https://packaging.python.org/guides/installing-using-linux-tools/).
 - Download the project.
   - If you have git installed, you can run `git clone https://github.com/eldevigo/CoC-Python.git`
-  - If you don't have git, or you prefer not to use it, run `wget https://github.com/eldevigo/CoC-Python/archive/master.zip && unzip master.zip && rm master.zip`
+  - If you don't have git, or you prefer not to use it, run the following:
+  - `wget https://github.com/eldevigo/CoC-Python/archive/master.zip && unzip master.zip && rm master.zip`
     - On some distros you may need to install `wget` and/or `unzip`. If you're running one of these, I assume you know how to do this.
 - Enter the project directory: `cd CoC-Python-master`
 - Install project dependencies: `pip3 install -r requirements.txt`
