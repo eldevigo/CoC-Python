@@ -23,7 +23,7 @@ Installing and running on Linux should be as simple as following these steps. Co
   - If you don't have git, or you prefer not to use it, run the following:
   - `wget https://github.com/eldevigo/CoC-Python/archive/master.zip && unzip master.zip && rm master.zip`
     - On some distros you may need to install `wget` and/or `unzip`. If you're running one of these, I assume you know how to do this.
-- Enter the project directory: `cd CoC-Python-master`
+- Enter the project directory: `cd CoC-Python*`
 - Install project dependencies: `pip3 install -r requirements.txt`
 - Call the terminal interface: `./coc-tui`
   - The TUI client will create a directory and a reference file to save your games in when you first run it. By default, it uses the path `~/.coc/`, but you can overide it with the `-s` option. Call `./coc-tui --help` for more info.
