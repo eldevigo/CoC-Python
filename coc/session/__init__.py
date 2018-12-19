@@ -112,7 +112,6 @@ class Session(COCClass):
         if 'choices' in state_template:
             if 'flags' in state_template['choices']:
                 for key in state_template['choices']['flags']:
-                    self.interface.clear()
                     initial_state['flags'][key] = self.interface.boolean_choice(
                             prompt=state_template['choices']['flags'][key]['prompt']
                             )

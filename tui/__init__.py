@@ -9,7 +9,6 @@ t = Terminal()
 w = textwrap.TextWrapper(fix_sentence_endings = True)
 _pause_sequence = False
 in_fullscreen = True
-offset = 0
 window_height = 0
 window_width = 0
 _screenbuffer = ''
@@ -32,30 +31,10 @@ def _get_geometry():
     window_width = t.width - 4
     w.width = window_width
 
-def _sequenced(func):
-    def _decorator(*args, **kwargs):
-        global _pause_sequence
-        if _pause_sequence:
-            _get_geometry()
-            with t.location(0,0):
-                with t.cbreak():
-                    sys.stdin.read(1)
-        _pause_sequence = True
-        return func(*args, **kwargs)
-    return _decorator
-
-def _break_sequence(func):
-    def _decorator(*args, **kwargs):
-        _pause_sequence = False
-        return func(*args, **kwargs)
-    return _decorator
-
 def _dump_buffer(func):
     def _decorator(*args, **kwargs):
         global _screenbuffer
-        global offset
         _screenbuffer = ''
-        offset = 0
         return func(*args, **kwargs)
     return _decorator
 
@@ -81,13 +60,13 @@ class Interface:
         return self.blank_window()
 
     @_fullscreen
-    @_break_sequence
     def blank_window(self):
         lines = window_height
-        with t.location(3,lines):
+        #with t.location(3,lines):
+        with t.hidden_cursor():
             while lines:
+                t.move(lines+1, 3)
                 _echo(t.clear_eol)
-                t.move_y(lines)
                 lines -= 1
 
     @_fullscreen
@@ -109,23 +88,36 @@ class Interface:
             _echo(text)
 
     @_fullscreen
-    @_sequenced
-    def print(self, text=None):
-        if text:
-            _screenbuffer = _screenbuffer + '\n\n' + text
-        lines = list()
-        for line in _screenbuffer.splitlines():
-            lines.extend(w.wrap(line))
-        y = 2
-        for item in lines[offset:window_height+offset]:
-            with t.location(x=3,y=y):
-                _echo(t.clear_eol)
-                _echo(item)
-            y +=1
+    def print(self, text=None, pause=True):
+        while True:
+            global _screenbuffer
+            global window_height
+            offset = 0
+            if text:
+                _screenbuffer = _screenbuffer + '\n\n' + text
+            lines = list()
+            for line in _screenbuffer.splitlines():
+                lines.extend(w.wrap(line))
+            y = 2
+            for item in lines[-(window_height+offset):-offset]:
+                with t.location(x=3,y=y):
+                    _echo(t.clear_eol)
+                    _echo(item)
+                y +=1
+            if pause:
+                c = '_'
+                while c not in ' +-':
+                    c = self.get_char()
+                    if c == '+':
+                        offset = min(offset + 3, len(lines) - window_height)
+                    elif c == '-':
+                        offset = max(0, offset - 3)
+                    else:
+                        return
+            else:
+                return
 
     @_fullscreen
-    @_break_sequence
-    @_sequenced
     @_dump_buffer
     @_clean_up_errors
     def menu_choice(self, options, prompt=None):
@@ -143,8 +135,8 @@ class Interface:
                     _echo(t.clear_eol)
                     _echo(item)
                 y +=1
-        global offset
         global window_height
+        offset = 0
         if prompt:
             self.title(prompt)
         selection_keys = '0123456789abcdefghijklmnoprstuvwxyz'
@@ -177,27 +169,24 @@ class Interface:
             try:
                 return dict(renderable)[c]
             except KeyError as e:
-                self.error("({0}) is not a valid choice!".format(e.args[0]))
+                self.error("that's not a valid choice!".format(e.args[0]))
 
     @_fullscreen
-    @_break_sequence
     @_clean_up_errors
     def boolean_choice(self, prompt=None, title=None):
         if title:
             self.title(title)
         self.clear()
         self.prompt("Press (y) or (n) to choose.")
-        self.print(prompt)
+        self.print(prompt, pause=False)
         while True:
             b = self.get_char()
             if b == 'y':
                 return True
             if b == 'n':
                 return False
-            self.error('``{0}`` is not a valid choice!'.format(b))
 
     @_fullscreen
-    @_break_sequence
     @_dump_buffer
     def get_char(self, prompt=None, title=None):
         if prompt:
@@ -206,12 +195,12 @@ class Interface:
             self.title(title)
         with t.location(1, window_height+4):
             _echo(t.clear_eol())
-            with t.cbreak():
-                c = t.inkey()
+            with t.hidden_cursor():
+                with t.cbreak():
+                    c = t.getch()
         return c
 
     @_fullscreen
-    @_break_sequence
     @_dump_buffer
     def get_line(self, prompt=None, title=None):
         if prompt:
@@ -224,7 +213,6 @@ class Interface:
         return line
 
     @_fullscreen
-    @_break_sequence
     @_dump_buffer
     @_clean_up_errors
     def get_quantity(self, max, min, float=False, autoround=True, prompt=None, title=None):

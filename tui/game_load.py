@@ -23,8 +23,7 @@ def select_player(save_path):
     while True:
         save_name = i.menu_choice(menu, prompt="Select a save!")
         if save_name == '< new game >':
-            i.prompt("Beginning a new game! What will we call you?")
-            name = i.get_line()
+            name = i.get_line(prompt="Beginning a new game! What will we call you?")
             if not name:
                 i.error("Empty names are not allowed!")
             elif name in saves['files']:
