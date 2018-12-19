@@ -30,8 +30,8 @@ def select_player(save_path):
             elif name in saves['files']:
                 i.error("A game with that name already exists!")
             else:
-                i.prompt('')
-                i.print("Welcome, {0}!".format(name))
+                i.clear()
+                i.prompt("Welcome, {0}!".format(name))
                 return save_path.rstrip('/') + '/' + name + '.csf'
         else:
             return save_path.rstrip('/') + '/' + saves['files'][save_name] + '.csf'
