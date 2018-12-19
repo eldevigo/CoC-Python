@@ -15,6 +15,7 @@ _screenbuffer = ''
 
 def _fullscreen(func):
     def _decorator(*args, **kwargs):
+        global in_fullscreen
         try:
             return func(*args, **kwargs)
         except InterfaceException:
@@ -82,22 +83,35 @@ class Interface:
 
     @_fullscreen
     def prompt(self, text):
+        try:
+            text = text.splitlines()[0]
+            text = text[:window_width - 4]
+        except IndexError:
+            pass
         with t.location(3, t.height-3):
             _echo(t.clear_eol())
             _echo(text)
 
     @_fullscreen
-    def print(self, text=None, pause=True, dump_buffer=False):
+    def print(self, text=None, pause=True, buffer='use'):
         global _screenbuffer
         global window_height
-        if dump_buffer:
+        if buffer == 'flush':
             _screenbuffer = ''
+        self.blank_window()
         offset = 0
-        if text:
-            _screenbuffer = _screenbuffer + '\n\n' + text
         lines = list()
-        for line in _screenbuffer.splitlines():
-            lines.extend(w.wrap(line))
+        if text:
+            if buffer == 'ignore':
+                for line in text.splitlines():
+                    lines.extend(w.wrap(line))
+            else:
+                _screenbuffer = _screenbuffer + '\n\n' + text
+                for line in _screenbuffer.splitlines():
+                    lines.extend(w.wrap(line))
+        else:
+            for line in _screenbuffer.splitlines():
+                lines.extend(w.wrap(line))
         lines.reverse()
         while True:
             y = window_height+1
@@ -121,8 +135,9 @@ class Interface:
 
     @_fullscreen
     @_clean_up_errors
-    def menu_choice(self, options, prompt=None):
+    def menu_choice(self, choices, title=None):
         def draw_menu(renderable):
+            self.blank_window()
             rendered = [
                     '({0}) - {1}'.format(a,b)
                     for a,b in
@@ -138,23 +153,23 @@ class Interface:
                 y +=1
         global window_height
         offset = 0
-        if prompt:
-            self.title(prompt)
+        if title:
+            self.title(title)
         selection_keys = '0123456789abcdefghijklmnoprstuvwxyz'
         renderable = list(zip(selection_keys,
-            options[offset:window_height+offset]))
+            choices[offset:window_height+offset]))
         draw_menu(renderable)
         selection = None
         while True:
             c = self.get_char()
             if c == '+':
                 offset += 3
-                if offset > len(options) - window_height:
-                    offset = len(options) - window_height
+                if offset > len(choices) - window_height:
+                    offset = len(choices) - window_height
                 if offset < 0:
                     offset = 0
                 renderable = list(zip(selection_keys,
-                    options[offset:window_height+offset]))
+                    choices[offset:window_height+offset]))
                 draw_menu(renderable)
                 continue
             if c == '-':
@@ -162,7 +177,7 @@ class Interface:
                 if offset < 0:
                     offset = 0
                 renderable = list(zip(selection_keys,
-                    options[offset:window_height+offset]))
+                    choices[offset:window_height+offset]))
                 draw_menu(renderable)
                 continue
             if c == 'q':
@@ -174,12 +189,13 @@ class Interface:
 
     @_fullscreen
     @_clean_up_errors
-    def boolean_choice(self, prompt=None, title=None):
-        if title:
+    def boolean_choice(self, text=None, prompt="Press (y) or (n) to choose.", title=None):
+        if title is not None:
             self.title(title)
         self.clear()
-        self.prompt("Press (y) or (n) to choose.")
-        self.print(prompt, pause=False)
+        self.prompt(prompt)
+        if text:
+            self.print(text, pause=False, buffer='ignore')
         while True:
             b = self.get_char()
             if b == 'y':
@@ -188,11 +204,13 @@ class Interface:
                 return False
 
     @_fullscreen
-    def get_char(self, prompt=None, title=None):
+    def get_char(self, text=None, prompt=None, title=None):
         if prompt:
             self.prompt(prompt)
         if title:
             self.title(title)
+        if text:
+            self.print(text, pause=False, dump_buffer=True)
         with t.location(1, window_height+4):
             _echo(t.clear_eol())
             with t.hidden_cursor():
@@ -213,23 +231,27 @@ class Interface:
 
     @_fullscreen
     @_clean_up_errors
-    def get_quantity(self, max, min, float=False, autoround=True, prompt=None, title=None):
+    def get_quantity(self, max, min, is_float=False, autoround=True, text=None, prompt=None, title=None):
         try:
-            max = float(max) if float else int(max)
-            min = float(min) if float else int(min)
+            max = float(max) if is_float else int(max)
+            min = float(min) if is_float else int(min)
         except ValueError as e:
             raise InterfaceException("requested a quantity with non-numeric"
                     " value bounds (value was {0})".format(str(e.args[0])))
         if prompt:
             self.prompt(prompt)
+        else:
+            self.prompt('Enter a whole number between {0} and {1}'.format(min, max))
         if title:
             self.title(title)
+        if text:
+            self.print(text, pause=False, buffer='ignore')
         while True:
             with t.location(1, window_height+4):
                 _echo(t.clear_eol())
                 q = sys.stdin.readline().strip()
                 try:
-                    q = float(q) if float else int(q)
+                    q = float(q) if is_float else int(q)
                 except ValueError:
                     self.error("That's not a number!")
                     continue

@@ -113,28 +113,28 @@ class Session(COCClass):
             if 'flags' in state_template['choices']:
                 for key in state_template['choices']['flags']:
                     initial_state['flags'][key] = self.interface.boolean_choice(
-                            prompt=state_template['choices']['flags'][key]['prompt']
+                            state_template['choices']['flags'][key]['prompt']
                             )
             if 'counters' in state_template['choices']:
                 for key in state_template['choices']['counters']:
                     initial_state['counters'][key] = self.interface.get_quantity(
-                            prompt=state_template['choices']['counters'][key]['prompt'],
+                            text=state_template['choices']['counters'][key]['prompt'],
                             max=int(state_template['choices']['counters'][key]['max']),
                             min=0
                             )
             if 'numbers' in state_template['choices']:
                 for key in state_template['choices']['numbers']:
                     initial_state['numbers'][key] = self.interface.get_quantity(
-                            prompt=state_template['choices']['numbers'][key]['prompt'],
+                            text=state_template['choices']['numbers'][key]['prompt'],
                             max=state_template['choices']['numbers'][key]['max'],
                             min=state_template['choices']['numbers'][key]['min'],
-                            float=True
+                            is_float=True
                             )
             if 'strings' in state_template['choices']:
                 for key in state_template['choices']['strings']:
                     initial_state['strings'][key] = self.interface.menu_choice(
-                            prompt=state_template['choices']['strings'][key]['prompt'],
-                            choices=state_template['choices']['strings'][key]['choices']
+                            state_template['choices']['strings'][key]['choices'],
+                            title=state_template['choices']['strings'][key]['prompt']
                             )
 
         new_player = player.Player(player_name, self.world.id, initial_state, None)

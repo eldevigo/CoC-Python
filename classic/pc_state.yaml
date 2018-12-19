@@ -23,7 +23,19 @@ choices:
     colorblind:
       prompt: "Are you colorblind?"
   counters:
+    difficulty:
+      prompt: |-
+        What difficulty would you like to play at?
+        0 - easy
+        1 - normal
+        2 - hard
+        3 - insane
+      max: 3
   numbers:
+    height:
+      prompt: "How tall are you, in meters?"
+      min: 1.2
+      max: 2.2
   strings:
     hair_color:
       prompt: "Choose your hair color"
