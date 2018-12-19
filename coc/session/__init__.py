@@ -117,7 +117,6 @@ class Session(COCClass):
                             )
             if 'counters' in state_template['choices']:
                 for key in state_template['choices']['counters']:
-                    self.interface.clear()
                     initial_state['counters'][key] = self.interface.get_quantity(
                             prompt=state_template['choices']['counters'][key]['prompt'],
                             max=int(state_template['choices']['counters'][key]['max']),
@@ -125,7 +124,6 @@ class Session(COCClass):
                             )
             if 'numbers' in state_template['choices']:
                 for key in state_template['choices']['numbers']:
-                    self.interface.clear()
                     initial_state['numbers'][key] = self.interface.get_quantity(
                             prompt=state_template['choices']['numbers'][key]['prompt'],
                             max=state_template['choices']['numbers'][key]['max'],
@@ -134,7 +132,6 @@ class Session(COCClass):
                             )
             if 'strings' in state_template['choices']:
                 for key in state_template['choices']['strings']:
-                    self.interface.clear()
                     initial_state['strings'][key] = self.interface.menu_choice(
                             prompt=state_template['choices']['strings'][key]['prompt'],
                             choices=state_template['choices']['strings'][key]['choices']

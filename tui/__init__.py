@@ -62,11 +62,10 @@ class Interface:
     @_fullscreen
     def blank_window(self):
         lines = window_height
-        #with t.location(3,lines):
         with t.hidden_cursor():
             while lines:
-                t.move(lines+1, 3)
-                _echo(t.clear_eol)
+                with t.location(y=lines+1, x=3):
+                    _echo(t.clear_eol)
                 lines -= 1
 
     @_fullscreen
@@ -88,37 +87,39 @@ class Interface:
             _echo(text)
 
     @_fullscreen
-    def print(self, text=None, pause=True):
+    def print(self, text=None, pause=True, dump_buffer=False):
+        global _screenbuffer
+        global window_height
+        if dump_buffer:
+            _screenbuffer = ''
+        offset = 0
+        if text:
+            _screenbuffer = _screenbuffer + '\n\n' + text
+        lines = list()
+        for line in _screenbuffer.splitlines():
+            lines.extend(w.wrap(line))
+        lines.reverse()
         while True:
-            global _screenbuffer
-            global window_height
-            offset = 0
-            if text:
-                _screenbuffer = _screenbuffer + '\n\n' + text
-            lines = list()
-            for line in _screenbuffer.splitlines():
-                lines.extend(w.wrap(line))
-            y = 2
-            for item in lines[-(window_height+offset):-offset]:
-                with t.location(x=3,y=y):
+            y = window_height+1
+            for item in lines[offset:window_height+offset]:
+                with t.location(x=3, y=y):
                     _echo(t.clear_eol)
                     _echo(item)
-                y +=1
+                y -=1
             if pause:
                 c = '_'
                 while c not in ' +-':
                     c = self.get_char()
-                    if c == '+':
-                        offset = min(offset + 3, len(lines) - window_height)
-                    elif c == '-':
-                        offset = max(0, offset - 3)
-                    else:
-                        return
+                if c == '+':
+                    offset = min(offset + 3, len(lines) - window_height)
+                elif c == '-':
+                    offset = max(0, offset - 3)
+                else:
+                    return
             else:
                 return
 
     @_fullscreen
-    @_dump_buffer
     @_clean_up_errors
     def menu_choice(self, options, prompt=None):
         def draw_menu(renderable):
@@ -187,7 +188,6 @@ class Interface:
                 return False
 
     @_fullscreen
-    @_dump_buffer
     def get_char(self, prompt=None, title=None):
         if prompt:
             self.prompt(prompt)
@@ -201,7 +201,6 @@ class Interface:
         return c
 
     @_fullscreen
-    @_dump_buffer
     def get_line(self, prompt=None, title=None):
         if prompt:
             self.prompt(prompt)
@@ -213,7 +212,6 @@ class Interface:
         return line
 
     @_fullscreen
-    @_dump_buffer
     @_clean_up_errors
     def get_quantity(self, max, min, float=False, autoround=True, prompt=None, title=None):
         try:
