@@ -34,4 +34,4 @@ def select_player(save_path):
                 i.prompt("Welcome, {0}!".format(name))
                 return save_path.rstrip('/') + '/' + name + '.csf'
         else:
-            return save_path.rstrip('/') + '/' + saves['files'][save_name] + '.csf'
+            return save_path.rstrip('/') + '/' + saves['files'][save_name]

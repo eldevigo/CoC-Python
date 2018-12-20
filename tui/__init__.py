@@ -249,9 +249,9 @@ class Interface:
         while True:
             with t.location(1, window_height+4):
                 _echo(t.clear_eol())
-                q = sys.stdin.readline().strip()
+                raw = sys.stdin.readline().strip()
                 try:
-                    q = float(q) if is_float else int(q)
+                    q = float(raw) if is_float else int(raw)
                 except ValueError:
                     self.error("That's not a number!")
                     continue
@@ -260,12 +260,13 @@ class Interface:
                     return max
                 else:
                     self.error("Too high! Maximum value is {0}".format(str(max)))
-            if q < min:
+            elif q < min:
                 if autoround:
                     return min
                 else:
                     self.error("Too low! Minimum value is {0}".format(str(min)))
-            return q
+            else:
+                return q
 
 def _echo(text):
     """Display ``text`` and flush output."""

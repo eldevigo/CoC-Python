@@ -120,7 +120,8 @@ class Session(COCClass):
                     initial_state['counters'][key] = self.interface.get_quantity(
                             text=state_template['choices']['counters'][key]['prompt'],
                             max=int(state_template['choices']['counters'][key]['max']),
-                            min=0
+                            min=0,
+                            autoround=False
                             )
             if 'numbers' in state_template['choices']:
                 for key in state_template['choices']['numbers']:
@@ -128,6 +129,7 @@ class Session(COCClass):
                             text=state_template['choices']['numbers'][key]['prompt'],
                             max=state_template['choices']['numbers'][key]['max'],
                             min=state_template['choices']['numbers'][key]['min'],
+                            autoround=False,
                             is_float=True
                             )
             if 'strings' in state_template['choices']:
