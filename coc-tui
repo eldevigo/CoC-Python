@@ -9,7 +9,6 @@ import coc
 from coc.exceptions import *
 
 from tui import interface,t
-from tui.game_load import *
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -20,14 +19,5 @@ if __name__ == '__main__':
     parser.add_argument('--world-schema', nargs=1, default='classic/')
     args = parser.parse_args(sys.argv[1:])
 
-    try:
-        player_path = args.save_path + '/' + args.player
-    except TypeError:
-        try:
-            player_path = select_player(os.path.expanduser(args.save_path))
-        except ExitMenuException:
-            sys.exit(0)
-
-    session = coc.Session(world_path=args.world_schema, player_path=player_path, interface=interface)
-    session.begin()
-    print('Session terminated!')
+    coc.Session(world_path=args.world_schema, save_path=args.save_path, interface=interface).begin()
+    print('Session exited!')

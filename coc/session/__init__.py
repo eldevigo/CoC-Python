@@ -1,40 +1,71 @@
 import os
+import sys
 
 from coc import COCClass
 from coc import world
-from coc import player
+from coc import player as playerlib
+from coc.session.game_load import *
 
 class Session(COCClass):
     """ Represents an interactive play session, used by various interfaces to
     bind a Player and a World object to the interface so that they may be
     interacted with by a human.
     """
-    def __init__(self, world_path, player_path, interface):
+    def __init__(self, world_path, save_path, interface):
         super().__init__()
         self.world = world.load(world_path)
-        self.player_file = player_path
         self.interface = interface
-        try:
-            self.player = player.load(player_path)
-            if self.player.world_id != world.id:
-                raise LoadError("Save file does not match the selected world!")
-        except FileNotFoundError:
-            self.player = self.new_player()
-            self.player.save(player_path)
+        self.player = None
+        while not self.player:
+            try:
+                self.save_file = select_save(os.path.expanduser(save_path))
+                self.player = self.load_player(self.save_file)
+            except LoadError as e:
+                interface.print(str(e), buffer='flush')
+            except ExitMenuException:
+                sys.exit(0)
 
-    def save(self, save_path=None):
+    def load_player(self, save_file):
         try:
-            self.player.save(save_path)
+            player = playerlib.load(save_file)
+# FIXME: world ID generation is broken. the same world generates multiple IDs.
+# check the world ID scheme generating code, deepcopy may not be a stable operation.
+            #if player.world_id != self.world.id:
+            #    self.interface.prompt('')
+            #    raise LoadError("Save file does not match the selected world!")
+            return player
+        except LoadError as e:
+            raise LoadError(
+                    "Encountered an error while loading ``{0}``: {1}".format(
+                        save_file,
+                        str(e)
+                        )
+                    )
+        except FileNotFoundError:
+            player = self.new_player()
+            player.save(save_file)
+            with open(os.path.join(os.path.dirname(self.save_file), 'saves.yaml'), 'r') as file:
+                saves = yaml.load(file.read())
+            assert player.name not in saves
+            saves[player.name] = self.save_file
+            with open(os.path.join(os.path.dirname(self.save_file), 'saves.yaml'), 'w') as file:
+                file.write(yaml.dump(saves))
+            return player
+
+
+    def save_player(self, save_file=None):
+        try:
+            self.player.save(save_file)
         except AttributeError as e:
             if str(e) == "'NoneType' object has no attribute 'endswith'":
 # tried to check if a nonexistent path had the right file extension
-                self.player.save(self.player_file)
+                self.player.save(self.save_file)
             else:
                 raise
 
     def new_player(self):
         state_template = self.world.get_state_template()['pc']
-        player_name = os.path.split(self.player_file)[-1]
+        player_name = os.path.split(self.save_file)[-1]
         if player_name.endswith('csf'):
             player_name = os.path.splitext(player_name)[0]
         initial_state = {
@@ -139,6 +170,6 @@ class Session(COCClass):
                             title=state_template['choices']['strings'][key]['prompt']
                             )
 
-        new_player = player.Player(player_name, self.world.id, initial_state, None)
+        new_player = playerlib.Player(player_name, self.world.id, initial_state, None)
         return new_player
 

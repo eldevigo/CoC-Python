@@ -15,12 +15,12 @@ class Player(Immutable):
         self.state = state
         self.initialized = True
 
-    def save(self, path):
+    def save(self, save_file):
         """ Serialize all internal state and write to the given save path.
         """
-        if not path.endswith('csf'):
-            path = path + os.extsep + 'csf'
-        with open(path, 'w+') as file:
+        if not save_file.endswith('csf'):
+            save_file = save_file + os.extsep + 'csf'
+        with open(save_file, 'w+') as file:
             file.write(self._serialize())
 
     def _serialize(self):
@@ -35,10 +35,10 @@ class Player(Immutable):
         return yaml.dump(save)
 
 
-def load(path):
+def load(save_file):
     """ A factory function that loads a Player object from a file path.
     """
-    with open(path, 'r') as file:
+    with open(save_file, 'r') as file:
         player = yaml.load(file.read())
     return Player(**player)
 

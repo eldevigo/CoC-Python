@@ -22,6 +22,12 @@ class ExitMenuException(InterfaceException):
     def __init__(self, msg=None):
         super().__init__(msg)
 
+class InterfaceAPIError(InterfaceException):
+    """ Exception type for backing out of a menu
+    """
+    def __init__(self, msg=None):
+        super().__init__(msg)
+
 class NotPermittedError(COCException):
     """ Exception raised when inter-class permissions prevent an action
     """

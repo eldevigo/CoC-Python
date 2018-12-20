@@ -96,6 +96,8 @@ class Interface:
     def print(self, text=None, pause=True, buffer='use'):
         global _screenbuffer
         global window_height
+        if buffer not in ['ignore', 'use', 'flush']:
+            raise InterfaceAPIError("Interface.print() optional kwarg ``buffer`` only takes the values 'use', 'ignore', 'flush'")
         if buffer == 'flush':
             _screenbuffer = ''
         self.blank_window()
@@ -210,7 +212,7 @@ class Interface:
         if title:
             self.title(title)
         if text:
-            self.print(text, pause=False, dump_buffer=True)
+            self.print(text, pause=False, buffer='flush')
         with t.location(1, window_height+4):
             _echo(t.clear_eol())
             with t.hidden_cursor():
