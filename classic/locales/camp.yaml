@@ -1,0 +1,6 @@
+---
+type: town
+id: camp
+name: "at your camp"
+state:
+load_events: "camp/*.yaml"
