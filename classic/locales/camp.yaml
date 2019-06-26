@@ -3,4 +3,7 @@ type: town
 id: camp
 name: "at your camp"
 state:
+  counters:
+    - times_visited
+    - development_stage
 load_events: "camp/*.yaml"

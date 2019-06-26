@@ -1,5 +1,13 @@
 ---
 type: pc
+new_name_prompt: >-
+  You grew up in the small village of Ingnam, a remote village with rich
+  traditions, buried deep in the wilds. Every year for as long as you can
+  remember, your village has chosen a champion to send to the cursed Demon
+  Realm. Legend has it that in years Ingnam has failed to produce a champion,
+  chaos has reigned over the countryside. Children disappear, crops wilt, and
+  disease spreads like wildfire. This year, you have been selected to be the
+  champion. What is your name?
 defaults:
   flags:
     - found_tel_adre
@@ -18,6 +26,8 @@ statics:
     body_temperature: 98.5
   strings:
     camp_adjective: "dusty"
+    initial_event: "_gen_character"
+    initial_locale: "camp"
 choices:
   flags:
     colorblind:
@@ -49,3 +59,8 @@ choices:
         - purple
         - blue
         - green
+    gender:
+      prompt: "Are you a man or a woman?"
+      choices:
+        - Man
+        - Woman

@@ -16,6 +16,8 @@ def select_save(save_path):
     except FileNotFoundError as e:
 # No save.yaml yet on the target path. Assume this is an uninitialized save path.
         saves = {}
+        if not os.path.isdir(save_path):
+            os.mkdir(save_path)
         with open(os.path.join(save_path, 'saves.yaml'), 'w+') as file:
             file.write(yaml.dump(saves))
     menu = list(saves.keys())

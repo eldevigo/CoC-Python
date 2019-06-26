@@ -1,10 +1,12 @@
 import os
 import sys
+import yaml
 
 from coc import COCClass
 from coc import world
 from coc import player as playerlib
-from coc.session.game_load import *
+from coc.exceptions import *
+from coc.session import game_load,initialization
 
 class Session(COCClass):
     """ Represents an interactive play session, used by various interfaces to
@@ -18,7 +20,7 @@ class Session(COCClass):
         self.player = None
         while not self.player:
             try:
-                self.save_file = select_save(os.path.expanduser(save_path))
+                self.save_file = game_load.select_save(os.path.expanduser(save_path))
                 self.player = self.load_player(self.save_file)
             except LoadError as e:
                 interface.print(str(e), buffer='flush')
@@ -64,112 +66,19 @@ class Session(COCClass):
                 raise
 
     def new_player(self):
-        state_template = self.world.get_state_template()['pc']
+        state_template = self.world.get_state_template()
+        initial_state = dict()
+        initial_state['pc'] = initialization.initialize_pc_state(state_template['pc'], self.interface)
+        initial_state['game'] = initialization.initialize_game_state(state_template['game'], self.interface)
         player_name = os.path.split(self.save_file)[-1]
         if player_name.endswith('csf'):
             player_name = os.path.splitext(player_name)[0]
-        initial_state = {
-                'flags': dict(),
-                'counters': dict(),
-                'numbers': dict(),
-                'strings': dict()
-                }
-        if 'defaults' in state_template:
-            if 'flags' in state_template['defaults']:
-                initial_state['flags'].update(
-                        {
-                            flag: False
-                            for flag in
-                            state_template['defaults']['flags']
-                            }
-                        )
-            if 'counters' in state_template['defaults']:
-                initial_state['counters'].update(
-                        {
-                            counter: 0
-                            for counter in
-                            state_template['defaults']['counters']
-                            }
-                        )
-            if 'numbers' in state_template['defaults']:
-                initial_state['numbers'].update(
-                        {
-                            number: 0.0
-                            for number in
-                            state_template['defaults']['numbers']
-                            }
-                        )
-            if 'strings' in state_template['defaults']:
-                initial_state['strings'].update(
-                        {
-                            string: ''
-                            for string in
-                            state_template['defaults']['strings']
-                            }
-                        )
-        if 'statics' in state_template:
-            if 'flags' in state_template['statics']:
-                initial_state['flags'].update(
-                        {
-                            key:bool(state_template['statics']['flags'][key])
-                            for key in
-                            state_template['statics']['flags']
-                            }
-                        )
-            if 'counters' in state_template['statics']:
-                initial_state['counters'].update(
-                        {
-                            key:int(state_template['statics']['counters'][key])
-                            for key in
-                            state_template['statics']['counters']
-                            }
-                        )
-            if 'numbers' in state_template['statics']:
-                initial_state['numbers'].update(
-                        {
-                            key:float(state_template['statics']['numbers'][key])
-                            for key in
-                            state_template['statics']['numbers']
-                            }
-                        )
-            if 'strings' in state_template['statics']:
-                initial_state['strings'].update(
-                        {
-                            key:str(state_template['statics']['strings'][key])
-                            for key in
-                            state_template['statics']['strings']
-                            }
-                        )
-        if 'choices' in state_template:
-            if 'flags' in state_template['choices']:
-                for key in state_template['choices']['flags']:
-                    initial_state['flags'][key] = self.interface.boolean_choice(
-                            state_template['choices']['flags'][key]['prompt']
-                            )
-            if 'counters' in state_template['choices']:
-                for key in state_template['choices']['counters']:
-                    initial_state['counters'][key] = self.interface.get_quantity(
-                            text=state_template['choices']['counters'][key]['prompt'],
-                            max=int(state_template['choices']['counters'][key]['max']),
-                            min=0,
-                            autoround=False
-                            )
-            if 'numbers' in state_template['choices']:
-                for key in state_template['choices']['numbers']:
-                    initial_state['numbers'][key] = self.interface.get_quantity(
-                            text=state_template['choices']['numbers'][key]['prompt'],
-                            max=state_template['choices']['numbers'][key]['max'],
-                            min=state_template['choices']['numbers'][key]['min'],
-                            autoround=False,
-                            is_float=True
-                            )
-            if 'strings' in state_template['choices']:
-                for key in state_template['choices']['strings']:
-                    initial_state['strings'][key] = self.interface.menu_choice(
-                            state_template['choices']['strings'][key]['choices'],
-                            title=state_template['choices']['strings'][key]['prompt']
-                            )
-
         new_player = playerlib.Player(player_name, self.world.id, initial_state, None)
         return new_player
+
+    def play(self):
+        event_streams = list()
+        import pprint
+        pprint.pprint(self.player.state)
+        locale = self.player.get_state(['pc', 'strings', 'initial_locale'])
 

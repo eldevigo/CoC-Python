@@ -2,8 +2,8 @@
 type: event
 id: kiha_first_encounter
 sequence:
-  - type: change_npc_encounter
-    npc_id: npc_kiha
+  - type: set_default_event
+    npc: npc_kiha
     encounter_id: kiha_forest_behavior
   - type: render_text
     text: >-

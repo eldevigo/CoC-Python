@@ -47,8 +47,21 @@ class SchemaError(COCException):
     def __init__(self, msg=None, **kwargs):
         super().__init__(msg)
 
-class EntityNotFoundError(SchemaError):
-    """ Raised when a request to the entity registry fails to find something
+class ParseError(SchemaError):
+    """ Raised when trying to parse an assignment or conditional expression
+    that is malformed or otherwise cannot be evaluated
+    """
+    def __init__(self, expr, msg=None, **kwargs):
+        super().__init__(msg, schema={"<expr>": expr})
+
+class ObjectNotFoundError(SchemaError):
+    """ Raised when a request to an object registry fails to find something
+    """
+    def __init__(self, msg=None, **kwargs):
+        super().__init__(msg)
+
+class StateNotFoundError(SchemaError):
+    """ Raised when a query to the state index fails to match anything
     """
     def __init__(self, msg=None, **kwargs):
         super().__init__(msg)

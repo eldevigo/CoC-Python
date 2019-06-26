@@ -1,0 +1,9 @@
+---
+type: event
+id: _gen_character
+sequence:
+  - type: render_text
+    text: >-
+      What's up, sucker?
+  - type: branch
+    event: discover_camp

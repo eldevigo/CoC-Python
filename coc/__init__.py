@@ -19,4 +19,18 @@ class Immutable(COCClass):
         else:
             super().__setattr__(key, value)
 
+class EventContext(Immutable):
+    """ Common base class for world objects that have events associated with
+    them. Used mainly to handle event loading.
+    """
+    def __init__(self):
+        super().__init__()
+        self._events_loaded = False
+
+    def load_events(self):
+        if not self._events_loaded:
+            self._events_loaded = True
+            return self.event_path
+        return False
+
 from coc.session import Session

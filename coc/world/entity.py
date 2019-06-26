@@ -1,9 +1,9 @@
-from coc import Immutable
+from coc import EventContext
 from coc.exceptions import *
 
 entity_registry = dict()
 
-class Entity(Immutable):
+class Entity(EventContext):
     """ Common base class for all interactable entities in the world (monsters,
     npcs, etc.)
     """
@@ -31,32 +31,12 @@ class Entity(Immutable):
             except KeyError:
                 pass
 
-from coc.world import npc
-from coc.world import monster
-
-def construct(schemas):
-    entity_class = {
-            'npc': npc.NPC,
-            'monster': monster.Monster
-            }
-    try:
-        for item in schemas:
-            entity = entity_class[schema['type']](schema)
-            entity_registry[entity.id] = entity
-            entity_registry[schema.type] = entity
-    except AttributeError as e:
-        if str(e) == 'string indices must be integers':
-# schemas is of type schema, not of type list(schema)
-            entity = entity_class[schema['type']](schemas)
-            entity_registry[entity.id] = entity
-            entity_registry[schemas.type] = entity
-
 def get_all():
     return entity_registry.values()
 
-def get_by_id(entity_id):
+def get_by_id(id):
     try:
-        return entity_registry[entity_id]
+        return entity_registry[id]
     except KeyError as e:
-        raise EntityNotFoundError("entity " + entity_id +
-                " was not found in the entity registry") from e
+        raise ObjectNotFoundError("entity ``" + id +
+                "`` was not found in the entity registry") from e

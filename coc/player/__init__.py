@@ -1,5 +1,6 @@
 import yaml
 import os
+import copy
 
 from coc import *
 
@@ -14,6 +15,20 @@ class Player(Immutable):
         self.world_id = world_id
         self.state = state
         self.initialized = True
+
+    def get_state(self, state_path):
+        try:
+            if state_path[0] not in self.state:
+                raise Exception()
+            if state_path[1] not in self.state[state_path[0]]:
+                raise Exception()
+            if state_path[2] not in self.state[state_path[0]][state_path[1]]:
+                raise Exception()
+            return copy.deepcopy(self.state[state_path[0]][state_path[1]][state_path[2]])
+        except IndexError as e:
+            raise
+    def set_state(self, state_path, value):
+        pass
 
     def save(self, save_file):
         """ Serialize all internal state and write to the given save path.

@@ -1,0 +1,4 @@
+---
+type: world
+initial_event: _gen_character
+initial_locale: camp
