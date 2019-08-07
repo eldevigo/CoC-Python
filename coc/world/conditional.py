@@ -1,6 +1,7 @@
 from coc import Immutable
 from coc.exceptions import *
 
+
 class Expr(Immutable):
     """ 
     """
@@ -9,12 +10,13 @@ class Expr(Immutable):
         try:
             filters = [Filter(f) for f in expr.split('|')[1:]]
         except AttributeError as e:
-            raise ParseError("conditional expression expected but received ``{0}`` instead".format(type(expr)))
+            raise ParseError("conditional expression expected but "
+                             "received ``{0}`` instead".format(type(expr)))
         self.tokens = condition.split(expr.split('|')[0])
         self.arity = len(tokens - 1)
         try:
             if arity == 0:
-                self.test = lambda x,_: bool(x)
+                self.test = lambda x, _: bool(x)
                 args = [tokens[0]]
             elif arity == 1:
                 try:
@@ -25,7 +27,7 @@ class Expr(Immutable):
             elif arity == 2:
                 try:
                     self.test = binary[tokens[1]]
-                    args = [tokens[0],tokens[2]]
+                    args = [tokens[0], tokens[2]]
                 except KeyError:
                     self.test = funcs[tokens[0]]
                     args = tokens[1:]
@@ -33,7 +35,9 @@ class Expr(Immutable):
                 self.test = funcs[tokens[0]]
                 args = tokens[1:]
         except KeyError:
-            raise ParseError("no recognized operator or function in conditional expression ``{0}``".format(expr), expr=expr)
+            raise ParseError("no recognized operator or function in "
+                             "conditional expression ``{0}``".format(expr),
+                             expr=expr)
         self.initialized = True
 
     def test(self, state_func):
@@ -47,6 +51,7 @@ class Expr(Immutable):
             else:
                 args.append(arg)
         return self.test(args)
+
 
 class All(Immutable):
     """
@@ -62,6 +67,7 @@ class All(Immutable):
                 return False
         return True
 
+
 class Any(Immutable):
     """
     """
@@ -76,6 +82,7 @@ class Any(Immutable):
                 return True
         return False
 
+
 def parse(schema):
     if type(schema) == str:
         return Expr(schema)
@@ -87,7 +94,9 @@ def parse(schema):
         except KeyError:
             return All(schema['all'])
     else:
-        raise SchemaError("conditional schema tree is of an unrecognized type", schema=schema)
+        raise SchemaError("conditional schema tree is of an unrecognized type",
+                          schema=schema)
+
 
 unary = {
         '!': lambda x: not x[0]
@@ -101,7 +110,6 @@ binary = {
         '<': lambda x: x[0] < x[1],
         '<=': lambda x: x[0] <= x[1],
         '': lambda x: x[0] > x[1],
-        '>': lambda x: x[0] > x[1],
         }
 
 funcs = {

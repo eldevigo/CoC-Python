@@ -8,16 +8,18 @@ import yaml
 import coc
 from coc.exceptions import *
 
-from tui import interface,t
+from tui import interface, t
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-D', '--debug')
     parser.add_argument('-p', '--player', nargs=1, default=None)
-# TODO: use os.fsencode() or something similar to make path name parsing os-agnostic
+# TODO: use os.fsencode() or something similar to make path name parsing
+#  os-agnostic
     parser.add_argument('-S', '--save-path', nargs=1, default='~/.coc/')
     parser.add_argument('--world-schema', nargs=1, default='classic/')
     args = parser.parse_args(sys.argv[1:])
 
-    coc.Session(world_path=args.world_schema, save_path=args.save_path, interface=interface).play()
+    coc.Session(world_path=args.world_schema, save_path=args.save_path,
+                interface=interface).play()
     print('Session exited!')
