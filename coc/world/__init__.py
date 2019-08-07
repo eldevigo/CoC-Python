@@ -24,7 +24,7 @@ class World(Immutable):
         schema_sets = dict()
         for path in file_paths:
             with open(path, 'r') as file:
-                gen = yaml.load_all(file.read())
+                gen = yaml.safe_load_all(file.read())
             schema_sets[path] = gen
         for set in schema_sets.items():
             for schema in set[1]:

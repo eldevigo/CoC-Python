@@ -47,11 +47,11 @@ class Session(COCClass):
             player = self.new_player()
             player.save(save_file)
             with open(os.path.join(os.path.dirname(self.save_file), 'saves.yaml'), 'r') as file:
-                saves = yaml.load(file.read())
+                saves = yaml.safe_load(file.read())
             assert player.name not in saves
             saves[player.name] = self.save_file
             with open(os.path.join(os.path.dirname(self.save_file), 'saves.yaml'), 'w') as file:
-                file.write(yaml.dump(saves))
+                file.write(yaml.safe_dump(saves))
             return player
 
 

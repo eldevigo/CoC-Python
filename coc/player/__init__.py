@@ -47,14 +47,14 @@ class Player(Immutable):
         save['world_id'] = self.world_id
         save['state'] = self.state
         save['meta'] = self.meta
-        return yaml.dump(save)
+        return yaml.safe_dump(save)
 
 
 def load(save_file):
     """ A factory function that loads a Player object from a file path.
     """
     with open(save_file, 'r') as file:
-        player = yaml.load(file.read())
+        player = yaml.safe_load(file.read())
     return Player(**player)
 
 
