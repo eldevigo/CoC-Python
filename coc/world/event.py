@@ -81,47 +81,78 @@ class EventText(EventSequenceItem):
 
 
 class EventBranch(EventSequenceItem):
-    """ 
+    """ An event item that jumps to another Event or EventStream. This is the
+    core unit of event chaining and flow control.
     """
     def __init__(self, schema, condition=None):
         super().__init__(schema, condition)
         self.initialized = True
 
     def do(self, interface, setfunc):
-        pass
+        raise NotImplementedError()
+
+class EventPrompt(EventSequenceItem):
+    """ An event that presents the user with a menu of choices and returns the
+    selection, after optionally printing a prompt message.
+    """
+    def __init__(self, schema, condition=None):
+        super().__init__(schema, condition)
+        self.initialized = True
+
+    def do(self, interface, setfunc):
+        raise NotImplementedError()
 
 
 class EventModifyResource(EventSequenceItem):
-    """ 
+    """ An event that modifies existing states, e.g. counters or strings.
     """
     def __init__(self, schema, condition=None):
         super().__init__(schema, condition)
         self.initialized = True
 
     def do(self, interface, setfunc):
-        pass
+        raise NotImplementedError()
 
 
-class EventPrompt(EventSequenceItem):
-    """ 
+class EventAppendResource(EventSequenceItem):
+    """ An event that adds a new resource to an existing set of states on an
+    object, at the end of the list.
     """
     def __init__(self, schema, condition=None):
         super().__init__(schema, condition)
         self.initialized = True
 
     def do(self, interface, setfunc):
-        pass
+        raise NotImplementedError()
 
 
-class EventSetDefaultEvent(EventSequenceItem):
-    """ 
+class EventPrependResource(EventSequenceItem):
+    """ An event that adds a new resource to an existing set of states on an
+    object, at the beginning of the list.
+>>>>>>> Stashed changes
     """
     def __init__(self, schema, condition=None):
         super().__init__(schema, condition)
         self.initialized = True
 
     def do(self, interface, setfunc):
-        pass
+        raise NotImplementedError()
+
+class EventRemoveResource(EventSequenceItem):
+    """ An event that deletes a resource from the set of states on an existing
+    object.
+    """
+    def __init__(self, schema, condition=None):
+        super().__init__(schema, condition)
+        self.initialized = True
+
+    def do(self, interface, setfunc):
+        raise NotImplementedError()
+
+def implode(schema):
+    # TODO: return an EventRemoveResource object that removes itself from the
+    # current locale context's registered events
+    raise NotImplementedError()
 
 
 sequence_constructors = {
@@ -129,5 +160,5 @@ sequence_constructors = {
         'branch': EventBranch,
         'modify_resource': EventModifyResource,
         'prompt': EventPrompt,
-        'set_default_event': EventSetDefaultEvent,
+        'implode': implode,
         }

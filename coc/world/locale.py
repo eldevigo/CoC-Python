@@ -10,6 +10,15 @@ class Locale(EventContext):
         super().__init__()
 
 
+    def visit(self, player):
+        return self.get_event_stream(player)
+
+    def get_event_streams(self, player):
+        raise NotImplementedError()
+
+    def get_state_template(self):
+        raise NotImplementedError()
+
 # TODO: Let's come up with a more elegant solution for this. Maybe it makes
 #   sense to have all locale subclasses register themselves in a shared locale
 #   registry instead, and come up with a scheme to derive the locale type.
@@ -17,10 +26,10 @@ class Locale(EventContext):
 #   that many locales to handle.
 def get_by_id(id_):
     try:
-        return get_town_by_id(id_)
+        return town.get_by_id(id_)
     except ObjectNotFoundError:
         try:
-            return get_dungeon_by_id(id_)
+            return dungeon.get_by_id(id_)
         except ObjectNotFoundError:
             pass
         raise ObjectNotFoundError("locale ``" + id_ +

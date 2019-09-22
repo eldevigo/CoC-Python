@@ -114,3 +114,6 @@ def initialize_pc_state(state_template, interface):
 
 def initialize_game_state(state_template, interface):
     return {}
+
+def initialize_locale_state(state_template, interface):
+    return {}

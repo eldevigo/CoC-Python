@@ -3,6 +3,7 @@ import os
 import copy
 
 from coc import *
+from coc.exceptions import *
 
 
 class Player(Immutable):
@@ -18,19 +19,33 @@ class Player(Immutable):
         self.initialized = True
 
     def get_state(self, state_path):
-        try:
-            if state_path[0] not in self.state:
-                raise Exception()
-            if state_path[1] not in self.state[state_path[0]]:
-                raise Exception()
-            if state_path[2] not in self.state[state_path[0]][state_path[1]]:
-                raise Exception()
-            return copy.deepcopy(
-                self.state[state_path[0]][state_path[1]][state_path[2]])
-        except IndexError as e:
-            raise
+        path_tokens = state_path.split('.')
+        scope = state
+        resolved = list()
+        for token in path_tokens:
+            try:
+                scope = scope[token]
+                resolved.append(token)
+            except KeyError:
+                raise StateNotFoundError(
+                        msg="unable to resolve state path ``{0}``"
+                          .format('.'.join(resolved)),
+                        found=resolved[0:-1],
+                        requested=state_path,
+                        error=resolved[-1])
+        if type(scope) == dict:
+            raise StateNotFoundError(
+                    msg="incomplete state path ``{0}`` - result is not a "
+                      "single state element"
+                      .format('.'.join(resolved)))
+        # TODO: figure out how to return a copy of this state so it is not
+        # modifiable
+        return scope
 
     def set_state(self, state_path, value):
+        # TODO: factor out the state resolution algorithm in get_state() above
+        # into a private helper method that returns a shallow-copied reference
+        # to the target state, and then modify it
         pass
 
     def save(self, save_file):
@@ -59,16 +74,3 @@ def load(save_file):
     with open(save_file, 'r') as file:
         player = yaml.safe_load(file.read())
     return Player(**player)
-
-
-# def create(name, world, interface):
-#     """ A factory function that creates a new player object from parameters
-#     and a world object.
-#     """
-#     race = interface.menu_choice(title='What race are you?',
-#             options=['human',
-#                 'orc',
-#                 'elf'
-#                 ]
-#         )
-#     return Player(name, world.id, **world.get_state_template())

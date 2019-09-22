@@ -20,6 +20,5 @@ def get_by_id(id_):
     try:
         return dungeon_registry[id_]
     except KeyError as e:
-        raise ObjectNotFoundError("dungeon ``" + entity_id +
-                                  "`` was not found in the dungeon registry"
-                                  ) from e
+        raise ObjectNotFoundError("dungeon ``" + id_ +
+                "`` was not found in the dungeon registry") from e

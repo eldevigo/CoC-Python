@@ -47,14 +47,14 @@ class World(Immutable):
             world = copy.deepcopy(self.world_template)
         except AttributeError:
             world = {
-                    'npc': {obj.id: npc.state_template()
+                    'npc': {obj.id: obj.get_state_template()
                             for obj in npc.get_all()},
-                    'monster': {obj.id: obj.state_template()
-                                for obj in monster.get_all()},
-                    'town': {obj.id: obj.state_template()
-                             for obj in town.get_all()},
-                    'dungeon': {obj.id: obj.state_template()
-                                for obj in dungeon.get_all()},
+                    'monster': {obj.id: obj.get_state_template()
+                            for obj in monster.get_all()},
+                    'town': {obj.id: obj.get_state_template()
+                            for obj in town.get_all()},
+                    'dungeon': {obj.id: obj.get_state_template()
+                            for obj in dungeon.get_all()},
                     }
             self.world_template = copy.deepcopy(world)
         ret = {
@@ -123,6 +123,17 @@ class World(Immutable):
     def _get_event_by_id(id_):
         return event.get_by_id(id_)
 
+
+    @classmethod
+    def get_locale_events(cls, id, player):
+        locale = None
+        for get_by_id in (cls._get_town_by_id, cls._get_dungeon_by_id):
+            try:
+                locale = get_by_id(id)
+                return locale.run(player)
+            except KeyError:
+                pass
+        raise KeyError("no locale found with id " + id)
 
 def load(schema_path):
     return World(schema_path)

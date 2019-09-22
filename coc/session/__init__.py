@@ -78,6 +78,7 @@ class Session(COCClass):
             state_template['pc'], self.interface)
         initial_state['game'] = initialization.initialize_game_state(
             state_template['game'], self.interface)
+        initial_state['world'] = state_template['world']
         player_name = os.path.split(self.save_file)[-1]
         if player_name.endswith('csf'):
             player_name = os.path.splitext(player_name)[0]
@@ -87,6 +88,17 @@ class Session(COCClass):
 
     def play(self):
         event_streams = list()
-        import pprint
-        pprint.pprint(self.player.state)
-        locale = self.player.get_state(['pc', 'strings', 'initial_locale'])
+        locale = self.player.get_state('pc.strings.initial_locale')
+# TODO: Wire up event playthrough, starting from coc.world.events.run()
+# It looks like conditionals aren't properly parsed and loaded from event sequences at event schema read time
+# Also looks like run() returns a generator of event sequence items, need to decide how to play the generated sequences to the UI - maybe add a do() function to EventSequenceItem that takes a passed-in UI object?
+# Also need a handler that is called when an event sequence terminates, which calls the visit event on the current locale
+# TODO: Maybe add a try-catch around this that allows graceful skipping of the initial event (thus going directly to the initial locale) if no initial event is defined
+        try:
+            event_streams.append(world.event.get_by_id(self.player.get_state('pc.strings.initial_event')).run(self))
+        except StateNotFoundError:
+            pass
+        while True:
+            while event_streams:
+                current_stream = event_streams.pop()
+            event_streams.append(self.world.get_locale_events(locale, self.player))
