@@ -1,9 +1,9 @@
 import sys
 import textwrap
-import curses
 from blessed import Terminal
 
-from coc.exceptions import *
+from coc.exceptions import InterfaceException, InterfaceAPIError, \
+    ExitMenuException
 
 t = Terminal()
 w = textwrap.TextWrapper(fix_sentence_endings=True)
@@ -151,8 +151,8 @@ class Interface:
                     for a, b in
                     renderable
                     ]
-            self.prompt('Press a key to select. q to quit, - to scroll up, + to'
-                        'scroll down.')
+            self.prompt('Press a key to select. q to quit, - to scroll up,'
+                        ' + to scroll down.')
             y = 2
             for item in rendered:
                 with t.location(x=5, y=y):
@@ -167,7 +167,6 @@ class Interface:
         renderable = list(zip(selection_keys,
                               choices[offset:window_height+offset]))
         draw_menu(renderable)
-        selection = None
         while True:
             c = self.get_char()
             if c == '+':
