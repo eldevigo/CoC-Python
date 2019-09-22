@@ -1,4 +1,4 @@
 **/*.swp
 env/
 **/__pycache__
-
+.idea
