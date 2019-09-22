@@ -2,6 +2,7 @@ from coc.world.event import get_by_id as get_event_by_id
 from coc.world.locale import get_by_id as get_locale_by_id
 from coc.exceptions import *
 
+
 def initialize_pc_state(state_template, interface):
     initial_state = {
             'flags': dict(),
@@ -46,7 +47,7 @@ def initialize_pc_state(state_template, interface):
         if 'flags' in state_template['statics']:
             initial_state['flags'].update(
                     {
-                        key:bool(state_template['statics']['flags'][key])
+                        key: bool(state_template['statics']['flags'][key])
                         for key in
                         state_template['statics']['flags']
                         }
@@ -54,7 +55,7 @@ def initialize_pc_state(state_template, interface):
         if 'counters' in state_template['statics']:
             initial_state['counters'].update(
                     {
-                        key:int(state_template['statics']['counters'][key])
+                        key: int(state_template['statics']['counters'][key])
                         for key in
                         state_template['statics']['counters']
                         }
@@ -62,7 +63,7 @@ def initialize_pc_state(state_template, interface):
         if 'numbers' in state_template['statics']:
             initial_state['numbers'].update(
                     {
-                        key:float(state_template['statics']['numbers'][key])
+                        key: float(state_template['statics']['numbers'][key])
                         for key in
                         state_template['statics']['numbers']
                         }
@@ -70,7 +71,7 @@ def initialize_pc_state(state_template, interface):
         if 'strings' in state_template['statics']:
             initial_state['strings'].update(
                     {
-                        key:str(state_template['statics']['strings'][key])
+                        key: str(state_template['statics']['strings'][key])
                         for key in
                         state_template['statics']['strings']
                         }
@@ -84,17 +85,20 @@ def initialize_pc_state(state_template, interface):
         if 'counters' in state_template['choices']:
             for key in state_template['choices']['counters']:
                 initial_state['counters'][key] = interface.get_quantity(
-                        text=state_template['choices']['counters'][key]['prompt'],
-                        max=int(state_template['choices']['counters'][key]['max']),
-                        min=0,
+                        text=
+                        state_template['choices']['counters'][key]['prompt'],
+                        max_=
+                        int(state_template['choices']['counters'][key]['max']),
+                        min_=0,
                         autoround=False
                         )
         if 'numbers' in state_template['choices']:
             for key in state_template['choices']['numbers']:
                 initial_state['numbers'][key] = interface.get_quantity(
-                        text=state_template['choices']['numbers'][key]['prompt'],
-                        max=state_template['choices']['numbers'][key]['max'],
-                        min=state_template['choices']['numbers'][key]['min'],
+                        text=
+                        state_template['choices']['numbers'][key]['prompt'],
+                        max_=state_template['choices']['numbers'][key]['max'],
+                        min_=state_template['choices']['numbers'][key]['min'],
                         autoround=False,
                         is_float=True
                         )
@@ -102,9 +106,11 @@ def initialize_pc_state(state_template, interface):
             for key in state_template['choices']['strings']:
                 initial_state['strings'][key] = interface.menu_choice(
                         state_template['choices']['strings'][key]['choices'],
-                        title=state_template['choices']['strings'][key]['prompt']
+                        title=
+                        state_template['choices']['strings'][key]['prompt']
                         )
     return initial_state
+
 
 def initialize_game_state(state_template, interface):
     return {}

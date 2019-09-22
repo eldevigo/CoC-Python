@@ -4,6 +4,7 @@ import copy
 
 from coc import *
 
+
 class Player(Immutable):
     """ Contains all state for an in-progress game, including world state, NPC
     interaction state, PC status effects and possessions, etc.
@@ -24,9 +25,11 @@ class Player(Immutable):
                 raise Exception()
             if state_path[2] not in self.state[state_path[0]][state_path[1]]:
                 raise Exception()
-            return copy.deepcopy(self.state[state_path[0]][state_path[1]][state_path[2]])
+            return copy.deepcopy(
+                self.state[state_path[0]][state_path[1]][state_path[2]])
         except IndexError as e:
             raise
+
     def set_state(self, state_path, value):
         pass
 
@@ -59,8 +62,8 @@ def load(save_file):
 
 
 # def create(name, world, interface):
-#     """ A factory function that creates a new player object from parameters and
-#     a world object.
+#     """ A factory function that creates a new player object from parameters
+#     and a world object.
 #     """
 #     race = interface.menu_choice(title='What race are you?',
 #             options=['human',
