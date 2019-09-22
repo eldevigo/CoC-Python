@@ -10,7 +10,7 @@ def select_save(save_path):
     # Read existing save files to populate the menu
     try:
         with open(os.path.join(save_path, 'saves.yaml'), 'r') as file:
-            saves = yaml.load(file.read())
+            saves = yaml.safe_load(file.read())
     except (yaml.YAMLError, KeyError) as e:
         raise LoadError("Unable to load your saves.\n"
                         "saves.yaml is corrupted!") from e
@@ -21,7 +21,7 @@ def select_save(save_path):
         if not os.path.isdir(save_path):
             os.mkdir(save_path)
         with open(os.path.join(save_path, 'saves.yaml'), 'w+') as file:
-            file.write(yaml.dump(saves))
+            file.write(yaml.safe_dump(saves))
     menu = list(saves.keys())
     menu.insert(0, '< new game >')
     while True:
