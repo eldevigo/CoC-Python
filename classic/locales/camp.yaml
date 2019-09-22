@@ -6,4 +6,45 @@ state:
   counters:
     - times_visited
     - development_stage
-load_events: "camp/*.yaml"
+  events:
+    - discover_camp
+    - at_camp
+
+---
+type: event
+id: discover_camp
+sequence:
+  - type: text
+    text: "You found the perfect place to camp!"
+  - type: text
+    text: "You'd better set up your tent."
+  - type: text
+    text: "Kiha is here!"
+  - type: npc
+    npc_id: npc_kiha
+  - type: implode
+
+---
+type: event
+id: at_camp
+sequence:
+  - type: prompt
+    choices:
+      - label: "Explore"
+        branch: explore
+      - label: "Die"
+        branch: die
+
+---
+type: event
+id: explore
+sequence:
+  - type: text
+    text: "You explore all day, but find nothing."
+
+---
+type: event
+id: die
+sequence:
+  - type: text
+    text: "You die gruesomely."
