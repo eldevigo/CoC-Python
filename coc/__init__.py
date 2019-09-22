@@ -1,9 +1,11 @@
 import os
 from abc import ABC
 
+
 class COCClass(ABC):
     """ Common base class for all CoC module classes
     """
+
 
 class Immutable(COCClass):
     """ Common base class for CoC subclasses that have properties which are
@@ -19,6 +21,7 @@ class Immutable(COCClass):
         else:
             super().__setattr__(key, value)
 
+
 class EventContext(Immutable):
     """ Common base class for world objects that have events associated with
     them. Used mainly to handle event loading.
@@ -32,5 +35,6 @@ class EventContext(Immutable):
             self._events_loaded = True
             return self.event_path
         return False
+
 
 from coc.session import Session

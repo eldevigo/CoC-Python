@@ -3,6 +3,7 @@ from coc.exceptions import *
 
 monster_registry = dict()
 
+
 class Monster(Entity):
     """ Common base class for all interactable entities in the world (monsters,
     """
@@ -13,15 +14,18 @@ class Monster(Entity):
             self.state['defeat_event_id'] = schema['state']['defeat_event']
         except KeyError as e:
             raise SchemaError("monster schema missing required field ``{0}``"
-                    .format(e.args[0]), schema=schema) from e
+                              .format(e.args[0]), schema=schema) from e
         self.initialized = True
+
 
 def get_all():
     return monster_registry.values()
 
-def get_by_id(id):
+
+def get_by_id(id_):
     try:
-        return monster_registry[id]
+        return monster_registry[id_]
     except KeyError as e:
         raise ObjectNotFoundError("monster ``" + entity_id +
-                "`` was not found in the monster registry") from e
+                                  "`` was not found in the monster registry"
+                                  ) from e

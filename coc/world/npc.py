@@ -3,6 +3,7 @@ from coc.exceptions import *
 
 npc_registry = dict()
 
+
 class NPC(Entity):
     """ Common base class for all interactable entities in the world (monsters,
     """
@@ -10,12 +11,14 @@ class NPC(Entity):
         super().__init__(schema)
         self.initialized = True
 
+
 def get_all():
     return npc_registry.values()
 
-def get_by_id(id):
+
+def get_by_id(id_):
     try:
-        return npc_registry[id]
+        return npc_registry[id_]
     except KeyError as e:
         raise ObjectNotFoundError("npc ``" + entity_id +
-                "`` was not found in the npc registry") from e
+                                  "`` was not found in the npc registry") from e

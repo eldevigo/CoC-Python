@@ -3,6 +3,7 @@ from coc.exceptions import *
 
 town_registry = dict()
 
+
 class Town(Locale):
     """ Represents a peaceful, visitable location with one or more selectable
     events as stores, NPCs, etc.
@@ -18,11 +19,13 @@ class Town(Locale):
         try:
             self.id = schema['id']
         except KeyError:
-            raise SchemaError("tried to load town object with no id field", schema=schema)
+            raise SchemaError("tried to load town object with no id field",
+                              schema=schema)
         try:
             self.name = schema['name']
         except KeyError:
-            raise SchemaError("tried to load town object with no id field", schema=schema)
+            raise SchemaError("tried to load town object with no id field",
+                              schema=schema)
         if 'flags' in schema['state']:
             for flag in schema['state']['flags']:
                 try:
@@ -30,7 +33,7 @@ class Town(Locale):
                     self.state['flags'][pair[0]] = bool(pair[1])
                 except AttributeError:
                     self.state['flags'][flag] = False
-                except (TypeError,IndexError) as e:
+                except (TypeError, IndexError) as e:
                     raise SchemaError(
                             "malformed flag state parameter ``{0}`` in town "
                             "object (id ``{1}``)".format(pair[0], self.id),
@@ -42,7 +45,7 @@ class Town(Locale):
                     self.state['counters'][pair[0]] = int(pair[1])
                 except AttributeError:
                     self.state['counters'][counter] = 0
-                except (TypeError,IndexError) as e:
+                except (TypeError, IndexError) as e:
                     raise SchemaError(
                             "malformed counter state parameter ``{0}`` in town "
                             "object (id ``{1}``)".format(pair[0], self.id),
@@ -54,7 +57,7 @@ class Town(Locale):
                     self.state['numbers'][pair[0]] = bool(pair[1])
                 except AttributeError:
                     self.state['numbers'][number] = 0.0
-                except (TypeError,IndexError) as e:
+                except (TypeError, IndexError) as e:
                     raise SchemaError(
                             "malformed number state parameter ``{0}`` in town "
                             "object (id ``{1}``)".format(pair[0], self.id),
@@ -66,18 +69,21 @@ class Town(Locale):
                     self.state['strings'][pair[0]] = str(pair[1])
                 except AttributeError:
                     self.state['strings'][string] = ''
-                except (TypeError,IndexError) as e:
+                except (TypeError, IndexError) as e:
                     raise SchemaError(
                             "malformed string state parameter ``{0}`` in town "
                             "object (id ``{1}``)".format(pair[0], self.id),
                             schema=schema) from e
 
+
 def get_all():
     return town_registry.values()
 
-def get_by_id(id):
+
+def get_by_id(id_):
     try:
-        return town_registry[id]
+        return town_registry[id_]
     except KeyError as e:
         raise ObjectNotFoundError("town ``" + entity_id +
-                "`` was not found in the town registry") from e
+                                  "`` was not found in the town registry"
+                                  ) from e

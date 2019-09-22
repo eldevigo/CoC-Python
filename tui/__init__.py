@@ -6,12 +6,13 @@ from blessed import Terminal
 from coc.exceptions import *
 
 t = Terminal()
-w = textwrap.TextWrapper(fix_sentence_endings = True)
+w = textwrap.TextWrapper(fix_sentence_endings=True)
 _pause_sequence = False
 in_fullscreen = True
 window_height = 0
 window_width = 0
 _screenbuffer = ''
+
 
 def _fullscreen(func):
     def _decorator(*args, **kwargs):
@@ -25,12 +26,14 @@ def _fullscreen(func):
             raise
     return _decorator
 
+
 def _get_geometry():
     global window_height
     global window_width
     window_height = t.height - 6
     window_width = t.width - 4
     w.width = window_width
+
 
 def _dump_buffer(func):
     def _decorator(*args, **kwargs):
@@ -39,10 +42,11 @@ def _dump_buffer(func):
         return func(*args, **kwargs)
     return _decorator
 
+
 def _clean_up_errors(func):
     def _decorator(*args, **kwargs):
         ret = func(*args, **kwargs)
-        with t.location(3,t.height-1):
+        with t.location(3, t.height-1):
             _echo(t.clear_eol)
         return ret
     return _decorator
@@ -97,7 +101,9 @@ class Interface:
         global _screenbuffer
         global window_height
         if buffer not in ['ignore', 'use', 'flush']:
-            raise InterfaceAPIError("Interface.print() optional kwarg ``buffer`` only takes the values 'use', 'ignore', 'flush'")
+            raise InterfaceAPIError(
+                "Interface.print() optional kwarg ``buffer`` only takes the "
+                "values 'use', 'ignore', 'flush'")
         if buffer == 'flush':
             _screenbuffer = ''
         self.blank_window()
@@ -121,7 +127,7 @@ class Interface:
                 with t.location(x=3, y=y):
                     _echo(t.clear_eol)
                     _echo(item)
-                y -=1
+                y -= 1
             if pause:
                 c = '_'
                 while c not in ' +-':
@@ -141,25 +147,25 @@ class Interface:
         def draw_menu(renderable):
             self.blank_window()
             rendered = [
-                    '({0}) - {1}'.format(a,b)
-                    for a,b in
+                    '({0}) - {1}'.format(a, b)
+                    for a, b in
                     renderable
                     ]
             self.prompt('Press a key to select. q to quit, - to scroll up, + to'
-                            'scroll down.')
+                        'scroll down.')
             y = 2
             for item in rendered:
-                with t.location(x=5,y=y):
+                with t.location(x=5, y=y):
                     _echo(t.clear_eol)
                     _echo(item)
-                y +=1
+                y += 1
         global window_height
         offset = 0
         if title:
             self.title(title)
         selection_keys = '0123456789abcdefghijklmnoprstuvwxyz'
         renderable = list(zip(selection_keys,
-            choices[offset:window_height+offset]))
+                              choices[offset:window_height+offset]))
         draw_menu(renderable)
         selection = None
         while True:
@@ -171,7 +177,7 @@ class Interface:
                 if offset < 0:
                     offset = 0
                 renderable = list(zip(selection_keys,
-                    choices[offset:window_height+offset]))
+                                      choices[offset:window_height+offset]))
                 draw_menu(renderable)
                 continue
             if c == '-':
@@ -179,7 +185,7 @@ class Interface:
                 if offset < 0:
                     offset = 0
                 renderable = list(zip(selection_keys,
-                    choices[offset:window_height+offset]))
+                                      choices[offset:window_height+offset]))
                 draw_menu(renderable)
                 continue
             if c == 'q':
@@ -191,7 +197,8 @@ class Interface:
 
     @_fullscreen
     @_clean_up_errors
-    def boolean_choice(self, text=None, prompt="Press (y) or (n) to choose.", title=None):
+    def boolean_choice(self, text=None, prompt="Press (y) or (n) to choose.",
+                       title=None):
         if title is not None:
             self.title(title)
         self.clear()
@@ -233,17 +240,20 @@ class Interface:
 
     @_fullscreen
     @_clean_up_errors
-    def get_quantity(self, max, min, is_float=False, autoround=True, text=None, prompt=None, title=None):
+    def get_quantity(self, max_, min_, is_float=False, autoround=True,
+                     text=None, prompt=None, title=None):
         try:
-            max = float(max) if is_float else int(max)
-            min = float(min) if is_float else int(min)
+            max_ = float(max_) if is_float else int(max_)
+            min_ = float(min_) if is_float else int(min_)
         except ValueError as e:
-            raise InterfaceException("requested a quantity with non-numeric"
-                    " value bounds (value was {0})".format(str(e.args[0])))
+            raise InterfaceException(
+                "requested a quantity with non-numeric value bounds (value "
+                "was {0})".format(str(e.args[0])))
         if prompt:
             self.prompt(prompt)
         else:
-            self.prompt('Enter a whole number between {0} and {1}'.format(min, max))
+            self.prompt(
+                'Enter a whole number between {0} and {1}'.format(min_, max_))
         if title:
             self.title(title)
         if text:
@@ -257,22 +267,26 @@ class Interface:
                 except ValueError:
                     self.error("That's not a number!")
                     continue
-            if q > max:
+            if q > max_:
                 if autoround:
-                    return max
+                    return max_
                 else:
-                    self.error("Too high! Maximum value is {0}".format(str(max)))
-            elif q < min:
+                    self.error(
+                        "Too high! Maximum value is {0}".format(str(max_)))
+            elif q < min_:
                 if autoround:
-                    return min
+                    return min_
                 else:
-                    self.error("Too low! Minimum value is {0}".format(str(min)))
+                    self.error(
+                        "Too low! Minimum value is {0}".format(str(min_)))
             else:
                 return q
+
 
 def _echo(text):
     """Display ``text`` and flush output."""
     sys.stdout.write(u'{}'.format(text))
     sys.stdout.flush()
+
 
 interface = Interface()
