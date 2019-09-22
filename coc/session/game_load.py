@@ -1,7 +1,7 @@
 import os
 import yaml
 
-from coc.exceptions import *
+from coc.exceptions import LoadError
 
 from tui import interface as i
 
@@ -14,7 +14,7 @@ def select_save(save_path):
     except (yaml.YAMLError, KeyError) as e:
         raise LoadError("Unable to load your saves.\n"
                         "saves.yaml is corrupted!") from e
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         # No save.yaml yet on the target path.
         # Assume this is an uninitialized save path.
         saves = {}

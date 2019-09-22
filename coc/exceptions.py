@@ -6,7 +6,8 @@ class COCException(Exception):
 
 
 class LoadError(COCException):
-    """ Exception type for all logical issues with loading game state and assets
+    """ Exception type for all logical issues with loading
+    game state and assets
     """
     def __init__(self, msg=None):
         super().__init__(msg)

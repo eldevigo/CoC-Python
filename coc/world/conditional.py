@@ -1,39 +1,39 @@
 from coc import Immutable
-from coc.exceptions import *
+from coc.exceptions import ParseError, StateNotFoundError, SchemaError
 
 
 class Expr(Immutable):
-    """ 
+    """
     """
     def __init__(self, expr):
         super().__init__()
         try:
-            filters = [Filter(f) for f in expr.split('|')[1:]]
-        except AttributeError as e:
+            self.filters = [Filter(f) for f in expr.split('|')[1:]]
+        except AttributeError:
             raise ParseError("conditional expression expected but "
                              "received ``{0}`` instead".format(type(expr)))
-        self.tokens = condition.split(expr.split('|')[0])
-        self.arity = len(tokens - 1)
+        self.tokens = expr.split('|')[0].split(' ')
+        self.arity = len(self.tokens - 1)
         try:
-            if arity == 0:
+            if self.arity == 0:
                 self.test = lambda x, _: bool(x)
-                args = [tokens[0]]
-            elif arity == 1:
+                self.args = [self.tokens[0]]
+            elif self.arity == 1:
                 try:
-                    self.test = unary[tokens[0]]
-                    args = [tokens[1]]
-                except:
-                    pass
-            elif arity == 2:
-                try:
-                    self.test = binary[tokens[1]]
-                    args = [tokens[0], tokens[2]]
+                    self.test = unary[self.tokens[0]]
+                    self.args = [self.tokens[1]]
                 except KeyError:
-                    self.test = funcs[tokens[0]]
-                    args = tokens[1:]
+                    pass
+            elif self.arity == 2:
+                try:
+                    self.test = binary[self.tokens[1]]
+                    self.args = [self.tokens[0], self.tokens[2]]
+                except KeyError:
+                    self.test = funcs[self.tokens[0]]
+                    self.args = self.tokens[1:]
             else:
-                self.test = funcs[tokens[0]]
-                args = tokens[1:]
+                self.test = funcs[self.tokens[0]]
+                self.args = self.tokens[1:]
         except KeyError:
             raise ParseError("no recognized operator or function in "
                              "conditional expression ``{0}``".format(expr),
@@ -96,6 +96,11 @@ def parse(schema):
     else:
         raise SchemaError("conditional schema tree is of an unrecognized type",
                           schema=schema)
+
+
+class Filter(Immutable):
+    def __init__(self, schema):
+        super().__init__()
 
 
 unary = {

@@ -1,5 +1,5 @@
 from coc import EventContext
-from coc.exceptions import *
+from coc.exceptions import ObjectNotFoundError, SchemaError
 
 entity_registry = dict()
 
@@ -30,7 +30,8 @@ class Entity(EventContext):
         for key, default in state_defaults.items():
             try:
                 self.state[key] = {
-                        id_: default for id_ in schema[key][counters]}
+                        id_: default for id_ in schema['state'][key]
+                }
             except KeyError:
                 pass
 
@@ -43,5 +44,6 @@ def get_by_id(id_):
     try:
         return entity_registry[id_]
     except KeyError as e:
-        raise ObjectNotFoundError("entity ``" + id_ + "`` was not found in the "
-                                                      "entity registry") from e
+        raise ObjectNotFoundError("entity ``" + id_ +
+                                  "`` was not found in the entity registry")\
+            from e

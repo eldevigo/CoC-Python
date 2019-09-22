@@ -1,11 +1,11 @@
 from coc.world.entity import Entity
-from coc.exceptions import *
+from coc.exceptions import ObjectNotFoundError, SchemaError
 
 monster_registry = dict()
 
 
 class Monster(Entity):
-    """ Common base class for all interactable entities in the world (monsters,
+    """ Common base class for all interactible entities in the world (monsters,
     """
     def __init__(self, schema):
         super().__init__(schema)
@@ -26,6 +26,6 @@ def get_by_id(id_):
     try:
         return monster_registry[id_]
     except KeyError as e:
-        raise ObjectNotFoundError("monster ``" + entity_id +
+        raise ObjectNotFoundError("monster ``" + id_ +
                                   "`` was not found in the monster registry"
                                   ) from e

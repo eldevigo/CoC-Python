@@ -1,13 +1,16 @@
+from abc import ABC
+
 from coc.world.locale import Locale
-from coc.exceptions import *
+from coc.exceptions import ObjectNotFoundError
 
 dungeon_registry = dict()
 
 
-class Dungeon(Locale):
-    """ Represents a hostile visitable location with a room map, where each room
-    contains one or more events, incl. puzzles, fights, and loot.
+class Dungeon(Locale, ABC):
+    """ Represents a hostile visitable location with a room map, where each
+    room contains one or more events, incl. puzzles, fights, and loot.
     """
+
     def __init__(self, schema):
         super().__init__(schema)
 
@@ -21,4 +24,5 @@ def get_by_id(id_):
         return dungeon_registry[id_]
     except KeyError as e:
         raise ObjectNotFoundError("dungeon ``" + id_ +
-                "`` was not found in the dungeon registry") from e
+                                  "`` was not found in the dungeon registry")\
+            from e

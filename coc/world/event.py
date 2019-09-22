@@ -1,5 +1,5 @@
 from coc import Immutable
-from coc.exceptions import *
+from coc.exceptions import LoadError, ObjectNotFoundError
 
 event_registry = dict()
 
@@ -24,8 +24,8 @@ class Event(Immutable):
                 load_sequence_item(item) for item in schema['sequence']]
         global event_registry
         if schema['id'] in event_registry:
-            raise LoadError("attempted to load event ``{0}`` but that event id "
-                            "already exists".format(schema['id']))
+            raise LoadError("attempted to load event ``{0}`` but that event id"
+                            " already exists".format(schema['id']))
         event_registry[schema['id']] = self
         self.initialized = True
 
@@ -47,7 +47,7 @@ def get_by_id(id_):
     try:
         return event_registry[id_]
     except KeyError as e:
-        raise ObjectNotFoundError("event ``" + entity_id +
+        raise ObjectNotFoundError("event ``" + id_ +
                                   "`` was not found in the event registry"
                                   ) from e
 
@@ -91,6 +91,7 @@ class EventBranch(EventSequenceItem):
     def do(self, interface, setfunc):
         raise NotImplementedError()
 
+
 class EventPrompt(EventSequenceItem):
     """ An event that presents the user with a menu of choices and returns the
     selection, after optionally printing a prompt message.
@@ -129,7 +130,6 @@ class EventAppendResource(EventSequenceItem):
 class EventPrependResource(EventSequenceItem):
     """ An event that adds a new resource to an existing set of states on an
     object, at the beginning of the list.
->>>>>>> Stashed changes
     """
     def __init__(self, schema, condition=None):
         super().__init__(schema, condition)
@@ -137,6 +137,7 @@ class EventPrependResource(EventSequenceItem):
 
     def do(self, interface, setfunc):
         raise NotImplementedError()
+
 
 class EventRemoveResource(EventSequenceItem):
     """ An event that deletes a resource from the set of states on an existing
@@ -148,6 +149,7 @@ class EventRemoveResource(EventSequenceItem):
 
     def do(self, interface, setfunc):
         raise NotImplementedError()
+
 
 def implode(schema):
     # TODO: return an EventRemoveResource object that removes itself from the

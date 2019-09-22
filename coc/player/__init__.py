@@ -1,9 +1,8 @@
 import yaml
 import os
-import copy
 
-from coc import *
-from coc.exceptions import *
+from coc import Immutable
+from coc.exceptions import StateNotFoundError
 
 
 class Player(Immutable):
@@ -20,7 +19,7 @@ class Player(Immutable):
 
     def get_state(self, state_path):
         path_tokens = state_path.split('.')
-        scope = state
+        scope = self.state
         resolved = list()
         for token in path_tokens:
             try:
@@ -29,15 +28,14 @@ class Player(Immutable):
             except KeyError:
                 raise StateNotFoundError(
                         msg="unable to resolve state path ``{0}``"
-                          .format('.'.join(resolved)),
+                            .format('.'.join(resolved)),
                         found=resolved[0:-1],
                         requested=state_path,
                         error=resolved[-1])
         if type(scope) == dict:
             raise StateNotFoundError(
                     msg="incomplete state path ``{0}`` - result is not a "
-                      "single state element"
-                      .format('.'.join(resolved)))
+                        "single state element".format('.'.join(resolved)))
         # TODO: figure out how to return a copy of this state so it is not
         # modifiable
         return scope

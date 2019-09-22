@@ -1,5 +1,5 @@
 from coc.world.entity import Entity
-from coc.exceptions import *
+from coc.exceptions import ObjectNotFoundError
 
 npc_registry = dict()
 
@@ -20,5 +20,6 @@ def get_by_id(id_):
     try:
         return npc_registry[id_]
     except KeyError as e:
-        raise ObjectNotFoundError("npc ``" + entity_id +
-                                  "`` was not found in the npc registry") from e
+        raise ObjectNotFoundError("npc ``" + id_ +
+                                  "`` was not found in the npc registry")\
+            from e

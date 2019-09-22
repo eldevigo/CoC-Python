@@ -4,9 +4,9 @@ import glob
 import hashlib
 import copy
 
-from coc import *
-from coc.world import npc, monster, conditional, event, town, dungeon
-from coc.exceptions import *
+from coc import Immutable
+from coc.world import npc, monster, event, town, dungeon
+from coc.exceptions import SchemaError
 
 
 class World(Immutable):
@@ -31,7 +31,7 @@ class World(Immutable):
         for set_ in schema_sets.items():
             for schema in set_[1]:
                 self._load_schema(set_[0], schema)
-
+        self.world_template = None
         self.id = hashlib.sha256(repr(self.get_state_template()).encode()
                                  ).hexdigest()
         self.initialized = True
@@ -40,7 +40,7 @@ class World(Immutable):
         return self.__setattr__(key, value)
 
     def __getitem__(self, key):
-        return self.__getattr__(key)
+        return self.__getattribute__(key)
 
     def get_state_template(self):
         try:
@@ -50,18 +50,18 @@ class World(Immutable):
                     'npc': {obj.id: obj.get_state_template()
                             for obj in npc.get_all()},
                     'monster': {obj.id: obj.get_state_template()
-                            for obj in monster.get_all()},
+                                for obj in monster.get_all()},
                     'town': {obj.id: obj.get_state_template()
-                            for obj in town.get_all()},
+                             for obj in town.get_all()},
                     'dungeon': {obj.id: obj.get_state_template()
-                            for obj in dungeon.get_all()},
+                                for obj in dungeon.get_all()},
                     }
             self.world_template = copy.deepcopy(world)
         ret = {
                 # 'entities': {
-                #         e.id: copy.deepcopy(e.state) for e in entity.get_all()},
+                #     e.id: copy.deepcopy(e.state) for e in entity.get_all()},
                 # 'locales': {
-                #         l.id: copy.deepcopy(l.state) for l in locale.get_all()},
+                #     l.id: copy.deepcopy(l.state) for l in locale.get_all()},
                 'pc': copy.deepcopy(self.pc_template),
                 'world': world,
                 'game': dict()
@@ -83,8 +83,9 @@ class World(Immutable):
         except KeyError as e:
             if e.args[0] == 'type':
                 raise SchemaError(
-                        'unable to load schema from {0} with missing'
-                        '``type`` parameter'.format(path), schema=schema) from e
+                        'unable to load schema from {0} with missing '
+                        '``type`` parameter'.format(path), schema=schema)\
+                    from e
             else:
                 raise SchemaError(
                         'unable to load schema from {0}. ``{1}`` is not a '
@@ -123,7 +124,6 @@ class World(Immutable):
     def _get_event_by_id(id_):
         return event.get_by_id(id_)
 
-
     @classmethod
     def get_locale_events(cls, id, player):
         locale = None
@@ -134,6 +134,7 @@ class World(Immutable):
             except KeyError:
                 pass
         raise KeyError("no locale found with id " + id)
+
 
 def load(schema_path):
     return World(schema_path)

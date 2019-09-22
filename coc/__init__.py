@@ -1,4 +1,4 @@
-import os
+from exceptions import ImmutablePropertyError
 from abc import ABC
 
 
@@ -12,6 +12,8 @@ class Immutable(COCClass):
     immutable after being initialized (i.e. most of them)
     """
     def __init__(self):
+        self.mutable = []
+        self.initialized = False
         super().__setattr__('initialized', False)
         self.immutable = list()
 
@@ -35,6 +37,3 @@ class EventContext(Immutable):
             self._events_loaded = True
             return self.event_path
         return False
-
-
-from coc.session import Session
