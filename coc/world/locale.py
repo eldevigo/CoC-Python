@@ -1,20 +1,26 @@
 from coc import EventContext
-from coc.world import town, dungeon
-from coc.exceptions import ObjectNotFoundError
+from coc.exceptions import LoadError, NotPermittedError, ObjectNotFoundError
+
+locale_registry = dict()
 
 
 class Locale(EventContext):
     """ Common base class for all visitable locations in the world, incl.
     towns, dungeons, and wilderness areas.
     """
+
+
     def __init__(self, schema):
         super().__init__()
+
 
     def visit(self, player):
         return self.get_event_streams(player)
 
+
     def get_event_streams(self, player):
         raise NotImplementedError()
+
 
     def get_state_template(self):
         raise NotImplementedError()
@@ -27,12 +33,25 @@ class Locale(EventContext):
 #   that many locales to handle.
 def get_by_id(id_):
     try:
-        return town.get_by_id(id_)
-    except ObjectNotFoundError:
-        try:
-            return dungeon.get_by_id(id_)
-        except ObjectNotFoundError:
-            pass
+        return locale_registry[id_]
+    except KeyError:
         raise ObjectNotFoundError("locale ``" + id_ +
-                                  "`` was not found in the town or dungeon "
-                                  "registry")
+                                  "`` was not found in the locale registry")
+
+
+def get_all_locales():
+    return locale_registry.values()
+
+
+def register_locale(id_, locale):
+    if not isinstance(locale, Locale):
+        raise NotPermittedError("Cannot register non-Locale object to locale"
+                                " registry - object type is ``{}``".format(
+                                    type(locale)
+                                )
+        )
+    elif id_ in locale_registry:
+        raise LoadError("attempted to load event ``{0}`` but that event id"
+                        " already exists".format(id_))
+    else:
+        locale_registry[id_] = locale

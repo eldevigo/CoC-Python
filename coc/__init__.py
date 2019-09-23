@@ -1,4 +1,4 @@
-from exceptions import ImmutablePropertyError
+from coc.exceptions import ImmutablePropertyError
 from abc import ABC
 
 
@@ -12,15 +12,18 @@ class Immutable(COCClass):
     immutable after being initialized (i.e. most of them)
     """
     def __init__(self):
-        self.mutable = []
         self.initialized = False
+        self.mutable = []
         super().__setattr__('initialized', False)
         self.immutable = list()
 
     def __setattr__(self, key, value):
-        if self.initialized and key not in self.mutable:
-            raise ImmutablePropertyError(self.__class__.__name__, key)
-        else:
+        try:
+            if self.initialized and key not in self.mutable:
+                raise ImmutablePropertyError(self.__class__.__name__, key)
+            else:
+                super().__setattr__(key, value)
+        except AttributeError:
             super().__setattr__(key, value)
 
 

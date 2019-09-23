@@ -1,10 +1,8 @@
 import copy
 
-from coc.world.locale import Locale
+from coc.world.locale import Locale, register_locale
 from coc.world.event import get_by_id as get_event_by_id
 from coc.exceptions import ObjectNotFoundError, SchemaError
-
-town_registry = dict()
 
 
 class Town(Locale):
@@ -88,9 +86,18 @@ class Town(Locale):
             return strings
 
         def load_events():
+            events = list()
             try:
-                for event_id in schema['events']:
-                    self.state['events'].append(get_event_by_id(event_id))
+                for event_id in schema['state']['events']:
+                    try:
+                        events.append(get_event_by_id(event_id))
+                    except ObjectNotFoundError as e:
+                        raise ObjectNotFoundError(
+                            "tried to load town object (id ``{0}``) with a "
+                            "nonexistant event_id in its event registry - "
+                            "requested id was ``{1}``"
+                            .format(self.id, event_id),
+                            schema=schema) from e
             except KeyError as e:
                 if e.args[0] == 'events':
                     # This is an error because eventless locales are not
@@ -101,11 +108,7 @@ class Town(Locale):
                         " registered events".format(self.id),
                         schema=schema)
                 raise
-            except ObjectNotFoundError as e:
-                raise SchemaError(
-                    "tried to load town object (id ``{0}``) with a nonexistant"
-                    " event_id in its event registry".format(self.id),
-                    schema=schema) from e
+            return events
 
         super().__init__(schema)
         try:
@@ -125,7 +128,7 @@ class Town(Locale):
             'strings': load_strings(),
             'events': load_events()
         }
-        town_registry[self.id] = self
+        register_locale(self.id, self)
 
     def get_state_template(self):
         return copy.deepcopy(self.state)
@@ -137,16 +140,3 @@ class Town(Locale):
         # problem for the Player object to solve, using the stored copy of
         # this town's state (from get_state_template())
         pass
-
-
-def get_all():
-    return town_registry.values()
-
-
-def get_by_id(id_):
-    try:
-        return town_registry[id_]
-    except KeyError as e:
-        raise ObjectNotFoundError("town ``" + id_ +
-                                  "`` was not found in the town registry")\
-            from e

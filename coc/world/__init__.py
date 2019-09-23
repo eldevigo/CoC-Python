@@ -5,14 +5,14 @@ import hashlib
 import copy
 
 from coc import Immutable
-from coc.world import npc, monster, event, town, dungeon
+from coc.world import npc, monster, event, town, dungeon, locale
 from coc.exceptions import SchemaError
 
 
 class World(Immutable):
-    """ Contains a read-only (after load) record of all world content. Worlds
-    hold all object assets, and a template state object which a Player copies
-    when a new game is started.
+    """ Contains a record of all world content. Worlds hold all object
+    assets, and a template state object which a Player copies when a new
+    game is started.
     Worlds are read-only after being initialized, and their contents are fully
     defined by a YAML world schema.
     """
@@ -23,14 +23,31 @@ class World(Immutable):
         for subdir in subdirs:
             file_paths.extend(glob.glob(
                     os.path.join(schema_root, subdir, '*.yaml')))
-        schema_sets = dict()
+        schema_types = [
+            'event',
+            'town',
+            'dungeon',
+            'npc',
+            'monster',
+            'world',
+            'pc'
+        ]
+        schema_sets = {key: [] for key in schema_types}
         for path in file_paths:
             with open(path, 'r') as file:
-                gen = yaml.safe_load_all(file.read())
-            schema_sets[path] = gen
-        for set_ in schema_sets.items():
-            for schema in set_[1]:
-                self._load_schema(set_[0], schema)
+                gen = list(yaml.safe_load_all(file.read()))
+            try:
+                for schema_type in schema_types:
+                    schema_sets[schema_type].extend(filter(
+                        lambda x: x['type'] == schema_type,
+                        gen
+                    ))
+            except KeyError:
+                raise SchemaError("An object schema at path ``{0}`` is "
+                                  "missing a 'type'` property")
+        for schema_type in schema_types:
+            for schema in schema_sets[schema_type]:
+                self._load_schema(schema_type, schema)
         self.world_template = None
         self.id = hashlib.sha256(repr(self.get_state_template()).encode()
                                  ).hexdigest()
@@ -105,12 +122,8 @@ class World(Immutable):
             self.__setattr__(item, schema[item])
 
     @staticmethod
-    def _get_town_by_id(id_):
-        return town.get_by_id(id_)
-
-    @staticmethod
-    def _get_dungeon_by_id(id_):
-        return dungeon.get_by_id(id_)
+    def _get_locale_by_id(id_):
+        return locale.get_by_id(id_)
 
     @staticmethod
     def _get_npc_by_id(id_):
@@ -126,14 +139,7 @@ class World(Immutable):
 
     @classmethod
     def get_locale_events(cls, id, player):
-        locale = None
-        for get_by_id in (cls._get_town_by_id, cls._get_dungeon_by_id):
-            try:
-                locale = get_by_id(id)
-                return locale.run(player)
-            except KeyError:
-                pass
-        raise KeyError("no locale found with id " + id)
+        return locale.get_by_id(id).run(player)
 
 
 def load(schema_path):

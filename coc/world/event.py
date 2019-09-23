@@ -1,5 +1,5 @@
 from coc import Immutable
-from coc.exceptions import LoadError, ObjectNotFoundError
+from coc.exceptions import LoadError, ObjectNotFoundError, SchemaError
 
 event_registry = dict()
 
@@ -20,8 +20,14 @@ class Event(Immutable):
             global sequence_constructors
             return sequence_constructors[seq_type](seq_schema)
 
-        self.sequence = [
-                load_sequence_item(item) for item in schema['sequence']]
+        try:
+            self.sequence = [
+                    load_sequence_item(item) for item in schema['sequence']
+            ]
+        except KeyError as e:
+            raise SchemaError("encountered an unknown sequence type ``{0}`` "
+                              "while attempting to  load event ``{1}``"
+                              .format(e.args[0], schema['id']))
         global event_registry
         if schema['id'] in event_registry:
             raise LoadError("attempted to load event ``{0}`` but that event id"
@@ -151,16 +157,35 @@ class EventRemoveResource(EventSequenceItem):
         raise NotImplementedError()
 
 
-def implode(schema):
-    # TODO: return an EventRemoveResource object that removes itself from the
-    # current locale context's registered events
-    raise NotImplementedError()
+class EventNpc(EventSequenceItem):
+    """ An event that represents an encounter with an NPC.
+    """
+    def __init__(self, schema, condition=None):
+        super().__init__(schema, condition)
+        self.initialized = True
+
+    def do(self, interface, setfunc):
+        raise NotImplementedError()
+
+
+class EventImplode(EventSequenceItem):
+    """ An event that represents an encounter with an NPC.
+    """
+    def __init__(self, schema, condition=None):
+        super().__init__(schema, condition)
+        self.initialized = True
+
+    def do(self, interface, setfunc):
+        # TODO: return an EventRemoveResource object that removes itself
+        # from the current locale context's registered events
+        raise NotImplementedError()
 
 
 sequence_constructors = {
-        'render_text': EventText,
+        'text': EventText,
         'branch': EventBranch,
         'modify_resource': EventModifyResource,
         'prompt': EventPrompt,
-        'implode': implode,
+        'npc': EventNpc,
+        'implode': EventImplode,
         }
