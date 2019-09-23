@@ -7,7 +7,7 @@ state:
     - times_visited
     - development_stage
   events:
-    - discover_camp
+    - _gen_character
     - at_camp
 
 ---

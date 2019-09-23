@@ -68,10 +68,8 @@ class World(Immutable):
                             for obj in npc.get_all()},
                     'monster': {obj.id: obj.get_state_template()
                                 for obj in monster.get_all()},
-                    'town': {obj.id: obj.get_state_template()
-                             for obj in town.get_all()},
-                    'dungeon': {obj.id: obj.get_state_template()
-                                for obj in dungeon.get_all()},
+                    'locale': {obj.id: obj.get_state_template()
+                               for obj in locale.get_all_locales()},
                     }
             self.world_template = copy.deepcopy(world)
         ret = {

@@ -5,8 +5,11 @@ import yaml
 from coc import COCClass
 from coc import world
 from coc import player as playerlib
-from coc.exceptions import ExitMenuException, LoadError, StateNotFoundError
+from coc.exceptions import ExitMenuException, LoadError, \
+    IncorrectObjectTypeError
 from coc.session import game_load, initialization
+from coc.world.locale import Locale
+from coc.world.event import Event
 
 
 class Session(COCClass):
@@ -87,31 +90,31 @@ class Session(COCClass):
         return new_player
 
     def play(self):
-        event_streams = list()
-        locale = self.player.get_state('pc.strings.initial_locale')
+        locales = [self.player.get_state('pc.strings.initial_locale')]
         # TODO: Wire up event playthrough, starting from coc.world.events.run()
         # It looks like conditionals aren't properly parsed and loaded from
         # event sequences at event schema read time
-        # Also looks like run() returns a generator of event sequence items,
-        # need to decide how to play the generated sequences to the UI - maybe
-        # add a do() function to EventSequenceItem that takes a passed-in UI
-        # object?
         # Also need a handler that is called when an event sequence terminates,
         # which calls the visit event on the current locale
-        # TODO: Maybe add a try-catch around this that allows graceful
-        # skipping of the initial event (thus going directly to the initial
-        # locale) if no initial event is defined
-        try:
-            event_streams.append(
-                world.event.get_by_id(
-                    self.player.get_state('pc.strings.initial_event')
-                ).run(self)
-            )
-        except StateNotFoundError:
-            pass
         while True:
-            while event_streams:
-                current_stream = event_streams.pop()
-            event_streams.append(
-                self.world.get_locale_events(locale, self.player)
-            )
+            current_locale = locales.pop()
+            current_events = self.player.visit(current_locale)
+            while current_events:
+                current_event = current_events.pop()
+                event_sequence = current_event.run(self.player.get_state)
+                for item in event_sequence:
+                    next_ = item.do(self.player, self.world,
+                                        self.interface)
+                    if isinstance(next_, Locale):
+                        locales.append(next_)
+                    elif isinstance(next_, Event):
+                        current_events.append(next_)
+                    elif next_ is not None:
+                        raise IncorrectObjectTypeError(
+                            "Sequence in event ``{0}`` returned an "
+                            "unsupported next object type ``{1}``"
+                            .format(current_event.id, type(next_)))
+            if not locales:
+                print("Ran out of locales on the stack, reattaching the last"
+                      " one visited")
+                locales.append(current_locale)

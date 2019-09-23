@@ -140,3 +140,4 @@ class Town(Locale):
         # problem for the Player object to solve, using the stored copy of
         # this town's state (from get_state_template())
         pass
+

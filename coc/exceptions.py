@@ -49,6 +49,13 @@ class ImmutablePropertyError(NotPermittedError):
         super().__init__("``{0}.{1}`` is immutable after initialization")
 
 
+class IncorrectObjectTypeError(NotPermittedError):
+    """ Exception raised when a class method receives an object of a type
+    that it doesn't want, e.g. when an Event is supplied but an Entity was
+    expected.
+    """
+
+
 class SchemaError(COCException):
     """ Generic error for syntactic or structural issues with the world schema
     """

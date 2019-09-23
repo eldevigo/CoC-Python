@@ -8,6 +8,8 @@ from coc.exceptions import StateNotFoundError
 class Player(Immutable):
     """ Contains all state for an in-progress game, including world state, NPC
     interaction state, PC status effects and possessions, etc.
+    Should deal only with state tracking and persistence. All runtime logic
+    should be kept in other classes.
     """
     def __init__(self, name, world_id, state, meta):
         super().__init__()
@@ -53,6 +55,13 @@ class Player(Immutable):
             save_file = save_file + os.extsep + 'csf'
         with open(save_file, 'w+') as file:
             file.write(self._serialize())
+
+    def visit(self, locale):
+        """
+        :param locale:
+        :return:
+        """
+
 
     def _serialize(self):
         """ returns a string that represents the internal state of self,

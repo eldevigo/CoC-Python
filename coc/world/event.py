@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from coc import Immutable
 from coc.exceptions import LoadError, ObjectNotFoundError, SchemaError
 
@@ -32,15 +33,19 @@ class Event(Immutable):
         if schema['id'] in event_registry:
             raise LoadError("attempted to load event ``{0}`` but that event id"
                             " already exists".format(schema['id']))
-        event_registry[schema['id']] = self
+        self.id = schema['id']
+        event_registry[self.id] = self
         self.initialized = True
 
-    def run(self, state):
+    def get_id(self):
+        return self.id
+
+    def run(self, state_func):
         seq = self.sequence
 
         def _generator():
             for item in seq:
-                if item.check_condition(state):
+                if item.check_condition(state_func):
                     yield item
         return _generator
 
@@ -58,7 +63,7 @@ def get_by_id(id_):
                                   ) from e
 
 
-class EventSequenceItem(Immutable):
+class EventSequenceItem(Immutable, ABC):
     """ Parent class for all event sequence items - represents a single step in
     an event stream.
     """
@@ -72,6 +77,10 @@ class EventSequenceItem(Immutable):
         else:
             return self.condition.test(getfunc)
 
+    @abstractmethod
+    def do(self, player, world, interface):
+        pass
+
 
 class EventText(EventSequenceItem):
     """ An event sequence item containing a block of text. This is the core
@@ -82,7 +91,7 @@ class EventText(EventSequenceItem):
         self.text = schema['text']
         self.initialized = True
 
-    def do(self, interface, setfunc):
+    def do(self, player, world, interface):
         interface.print(self.text)
 
 
@@ -94,8 +103,8 @@ class EventBranch(EventSequenceItem):
         super().__init__(schema, condition)
         self.initialized = True
 
-    def do(self, interface, setfunc):
-        raise NotImplementedError()
+    def do(self, player, world, interface):
+            raise NotImplementedError()
 
 
 class EventPrompt(EventSequenceItem):
@@ -106,7 +115,7 @@ class EventPrompt(EventSequenceItem):
         super().__init__(schema, condition)
         self.initialized = True
 
-    def do(self, interface, setfunc):
+    def do(self, player, world, interface):
         raise NotImplementedError()
 
 
@@ -117,7 +126,7 @@ class EventModifyResource(EventSequenceItem):
         super().__init__(schema, condition)
         self.initialized = True
 
-    def do(self, interface, setfunc):
+    def do(self, player, world, interface):
         raise NotImplementedError()
 
 
@@ -129,7 +138,7 @@ class EventAppendResource(EventSequenceItem):
         super().__init__(schema, condition)
         self.initialized = True
 
-    def do(self, interface, setfunc):
+    def do(self, player, world, interface):
         raise NotImplementedError()
 
 
@@ -141,7 +150,7 @@ class EventPrependResource(EventSequenceItem):
         super().__init__(schema, condition)
         self.initialized = True
 
-    def do(self, interface, setfunc):
+    def do(self, player, world, interface):
         raise NotImplementedError()
 
 
@@ -153,7 +162,7 @@ class EventRemoveResource(EventSequenceItem):
         super().__init__(schema, condition)
         self.initialized = True
 
-    def do(self, interface, setfunc):
+    def do(self, player, world, interface):
         raise NotImplementedError()
 
 
@@ -164,7 +173,7 @@ class EventNpc(EventSequenceItem):
         super().__init__(schema, condition)
         self.initialized = True
 
-    def do(self, interface, setfunc):
+    def do(self, player, world, interface):
         raise NotImplementedError()
 
 
@@ -175,7 +184,7 @@ class EventImplode(EventSequenceItem):
         super().__init__(schema, condition)
         self.initialized = True
 
-    def do(self, interface, setfunc):
+    def do(self, player, world, interface):
         # TODO: return an EventRemoveResource object that removes itself
         # from the current locale context's registered events
         raise NotImplementedError()
