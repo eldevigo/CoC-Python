@@ -3,6 +3,8 @@ import os
 
 from coc import Immutable
 from coc.exceptions import StateNotFoundError
+from coc.world.locale import get_by_id as get_locale_by_id
+from coc.world.locale import Locale
 
 
 class Player(Immutable):
@@ -56,11 +58,13 @@ class Player(Immutable):
         with open(save_file, 'w+') as file:
             file.write(self._serialize())
 
-    def visit(self, locale):
+    def visit(self, locale: str):
         """
         :param locale:
+        :type locale: str
         :return:
         """
+        return self.get_state('world.locale.{0}.events'.format(locale))
 
 
     def _serialize(self):

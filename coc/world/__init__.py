@@ -2,7 +2,7 @@ import yaml
 import os
 import glob
 import hashlib
-import copy
+from copy import deepcopy
 
 from coc import Immutable
 from coc.world import npc, monster, event, town, dungeon, locale
@@ -60,9 +60,9 @@ class World(Immutable):
         return self.__getattribute__(key)
 
     def get_state_template(self):
-        try:
-            world = copy.deepcopy(self.world_template)
-        except AttributeError:
+        if self.world_template:
+            world = deepcopy(self.world_template)
+        else:
             world = {
                     'npc': {obj.id: obj.get_state_template()
                             for obj in npc.get_all()},
@@ -71,13 +71,13 @@ class World(Immutable):
                     'locale': {obj.id: obj.get_state_template()
                                for obj in locale.get_all_locales()},
                     }
-            self.world_template = copy.deepcopy(world)
+            self.world_template = deepcopy(world)
         ret = {
                 # 'entities': {
-                #     e.id: copy.deepcopy(e.state) for e in entity.get_all()},
+                #     e.id: deepcopy(e.state) for e in entity.get_all()},
                 # 'locales': {
-                #     l.id: copy.deepcopy(l.state) for l in locale.get_all()},
-                'pc': copy.deepcopy(self.pc_template),
+                #     l.id: deepcopy(l.state) for l in locale.get_all()},
+                'pc': deepcopy(self.pc_template),
                 'world': world,
                 'game': dict()
                 }

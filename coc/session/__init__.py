@@ -10,6 +10,7 @@ from coc.exceptions import ExitMenuException, LoadError, \
 from coc.session import game_load, initialization
 from coc.world.locale import Locale
 from coc.world.event import Event
+from coc.world.event import get_by_id as get_event_by_id
 
 
 class Session(COCClass):
@@ -17,20 +18,24 @@ class Session(COCClass):
     bind a Player and a World object to the interface so that they may be
     interacted with by a human.
     """
-    def __init__(self, world_path, save_path, interface):
+    def __init__(self, world_path, interface):
         super().__init__()
         self.world = world.load(world_path)
         self.interface = interface
         self.player = None
+        self.save_file = None
+
+    def choose_save(self, save_path):
         while not self.player:
             try:
                 self.save_file = game_load.select_save(
                     os.path.expanduser(save_path))
-                self.player = self.load_player(self.save_file)
+                self.load_player(self.save_file)
             except LoadError as e:
-                interface.print(str(e), buffer='flush')
+                self.interface.print(str(e), buffer='flush')
             except ExitMenuException:
                 sys.exit(0)
+        return self
 
     def load_player(self, save_file):
         try:
@@ -42,7 +47,7 @@ class Session(COCClass):
             #     self.interface.prompt('')
             #     raise LoadError(
             #             "Save file does not match the selected world!")
-            return player
+            self.player = player
         except LoadError as e:
             raise LoadError(
                     "Encountered an error while loading ``{0}``: {1}".format(
@@ -61,7 +66,8 @@ class Session(COCClass):
             with open(os.path.join(os.path.dirname(self.save_file),
                                    'saves.yaml'), 'w') as file:
                 file.write(yaml.safe_dump(saves))
-            return player
+            self.player = player
+        return self
 
     def save_player(self, save_file=None):
         try:
@@ -98,13 +104,17 @@ class Session(COCClass):
         # which calls the visit event on the current locale
         while True:
             current_locale = locales.pop()
-            current_events = self.player.visit(current_locale)
+            current_events = [get_event_by_id(event) for
+                              event in self.player.visit(current_locale)]
             while current_events:
                 current_event = current_events.pop()
                 event_sequence = current_event.run(self.player.get_state)
                 for item in event_sequence:
-                    next_ = item.do(self.player, self.world,
-                                        self.interface)
+                    next_ = item.do(
+                        self.player,
+                        self.world,
+                        self.interface
+                    )
                     if isinstance(next_, Locale):
                         locales.append(next_)
                     elif isinstance(next_, Event):

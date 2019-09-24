@@ -33,21 +33,25 @@ class Event(Immutable):
         if schema['id'] in event_registry:
             raise LoadError("attempted to load event ``{0}`` but that event id"
                             " already exists".format(schema['id']))
-        self.id = schema['id']
-        event_registry[self.id] = self
+        self.id_ = schema['id']
+        event_registry[self.id_] = self
         self.initialized = True
 
     def get_id(self):
-        return self.id
+        return self.id_
 
     def run(self, state_func):
-        seq = self.sequence
+        for item in self.sequence:
+            if item.check_condition(state_func):
+                yield item
 
-        def _generator():
-            for item in seq:
-                if item.check_condition(state_func):
-                    yield item
-        return _generator
+    def __repr__(self):
+        return repr({
+            'id': self.id_,
+            'sequence': [
+                dict(item) for item in self.sequence
+            ]
+        })
 
 
 def get_all():
@@ -61,6 +65,10 @@ def get_by_id(id_):
         raise ObjectNotFoundError("event ``" + id_ +
                                   "`` was not found in the event registry"
                                   ) from e
+
+
+def is_loaded(id_):
+    return id_ in event_registry
 
 
 class EventSequenceItem(Immutable, ABC):
@@ -81,6 +89,10 @@ class EventSequenceItem(Immutable, ABC):
     def do(self, player, world, interface):
         pass
 
+    @abstractmethod
+    def __dict__(self):
+        pass
+
 
 class EventText(EventSequenceItem):
     """ An event sequence item containing a block of text. This is the core
@@ -94,6 +106,12 @@ class EventText(EventSequenceItem):
     def do(self, player, world, interface):
         interface.print(self.text)
 
+    def __dict__(self):
+        return {
+            'type': 'text',
+            'text': self.text
+        }
+
 
 class EventBranch(EventSequenceItem):
     """ An event item that jumps to another Event or EventStream. This is the
@@ -101,10 +119,17 @@ class EventBranch(EventSequenceItem):
     """
     def __init__(self, schema, condition=None):
         super().__init__(schema, condition)
+        self.event = schema['event']
         self.initialized = True
 
     def do(self, player, world, interface):
-            raise NotImplementedError()
+        raise NotImplementedError()
+
+    def __dict__(self):
+        return {
+            'type': 'branch',
+            'event': self.event
+        }
 
 
 class EventPrompt(EventSequenceItem):
@@ -113,10 +138,21 @@ class EventPrompt(EventSequenceItem):
     """
     def __init__(self, schema, condition=None):
         super().__init__(schema, condition)
+        try:
+            self.choices = schema['choices']
+        except KeyError:
+            raise SchemaError("Unable to load event sequence prompt - the "
+                              "prompt is missing a choices section")
         self.initialized = True
 
     def do(self, player, world, interface):
         raise NotImplementedError()
+
+    def __dict__(self):
+        return {
+            'type': 'prompt',
+            'choices': self.choices
+        }
 
 
 class EventModifyResource(EventSequenceItem):
@@ -127,6 +163,9 @@ class EventModifyResource(EventSequenceItem):
         self.initialized = True
 
     def do(self, player, world, interface):
+        raise NotImplementedError()
+
+    def __dict__(self):
         raise NotImplementedError()
 
 
@@ -141,6 +180,9 @@ class EventAppendResource(EventSequenceItem):
     def do(self, player, world, interface):
         raise NotImplementedError()
 
+    def __dict__(self):
+        raise NotImplementedError()
+
 
 class EventPrependResource(EventSequenceItem):
     """ An event that adds a new resource to an existing set of states on an
@@ -151,6 +193,9 @@ class EventPrependResource(EventSequenceItem):
         self.initialized = True
 
     def do(self, player, world, interface):
+        raise NotImplementedError()
+
+    def __dict__(self):
         raise NotImplementedError()
 
 
@@ -165,16 +210,26 @@ class EventRemoveResource(EventSequenceItem):
     def do(self, player, world, interface):
         raise NotImplementedError()
 
+    def __dict__(self):
+        raise NotImplementedError()
+
 
 class EventNpc(EventSequenceItem):
     """ An event that represents an encounter with an NPC.
     """
     def __init__(self, schema, condition=None):
         super().__init__(schema, condition)
+        self.npc_id = schema['npc_id']
         self.initialized = True
 
     def do(self, player, world, interface):
         raise NotImplementedError()
+
+    def __dict__(self):
+        return {
+            'type': 'npc',
+            'npc_id': self.npc_id
+        }
 
 
 class EventImplode(EventSequenceItem):
@@ -188,6 +243,11 @@ class EventImplode(EventSequenceItem):
         # TODO: return an EventRemoveResource object that removes itself
         # from the current locale context's registered events
         raise NotImplementedError()
+
+    def __dict__(self):
+        return {
+            'type': 'implode'
+        }
 
 
 sequence_constructors = {
