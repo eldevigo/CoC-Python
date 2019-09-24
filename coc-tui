@@ -5,7 +5,7 @@ import sys
 
 from coc.session import Session
 
-from tui import interface, t
+from tui import interface
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -17,6 +17,10 @@ if __name__ == '__main__':
     parser.add_argument('--world-schema', nargs=1, default='classic/')
     args = parser.parse_args(sys.argv[1:])
 
-    Session(world_path=args.world_schema, save_path=args.save_path,
-            interface=interface).play()
+    Session(
+        world_path=args.world_schema,
+        interface=interface
+    ).choose_save(
+        save_path=args.save_path
+    ).play()
     print('Session exited!')
