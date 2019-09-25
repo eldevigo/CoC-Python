@@ -25,7 +25,7 @@ class Town(Locale):
                     except (TypeError, IndexError):
                         raise SchemaError(
                             "malformed flag state parameter ``{0}`` in town"
-                            " object (id ``{1}``)".format(pair[0], self.id),
+                            " object (id ``{1}``)".format(pair[0], self.id_),
                             schema=schema)
             except KeyError:
                 pass
@@ -43,7 +43,7 @@ class Town(Locale):
                     except (TypeError, IndexError):
                         raise SchemaError(
                             "malformed counter state parameter ``{0}`` in town"
-                            " object (id ``{1}``)".format(pair[0], self.id),
+                            " object (id ``{1}``)".format(pair[0], self.id_),
                             schema=schema)
             except KeyError:
                 pass
@@ -61,7 +61,7 @@ class Town(Locale):
                     except (TypeError, IndexError):
                         raise SchemaError(
                             "malformed number state parameter ``{0}`` in town "
-                            "object (id ``{1}``)".format(pair[0], self.id),
+                            "object (id ``{1}``)".format(pair[0], self.id_),
                             schema=schema)
             except KeyError:
                 pass
@@ -79,7 +79,7 @@ class Town(Locale):
                     except (TypeError, IndexError):
                         raise SchemaError(
                             "malformed string state parameter ``{0}`` in town"
-                            " object (id ``{1}``)".format(pair[0], self.id),
+                            " object (id ``{1}``)".format(pair[0], self.id_),
                             schema=schema)
             except KeyError:
                 pass
@@ -94,8 +94,8 @@ class Town(Locale):
                             "tried to load town object (id ``{0}``) with a "
                             "nonexistant event_id in its event registry - "
                             "requested id was ``{1}``"
-                            .format(self.id, event_id),
-                            schema=schema) from e
+                            .format(self.id_, event_id),
+                            schema=schema)
                     events.append(event_id)
             except KeyError as e:
                 if e.args[0] == 'events':
@@ -104,14 +104,14 @@ class Town(Locale):
                     # attached to this town.
                     raise SchemaError(
                         "tried to load town object (id ``{0}``) with no"
-                        " registered events".format(self.id),
+                        " registered events".format(self.id_),
                         schema=schema)
                 raise
             return events
 
         super().__init__(schema)
         try:
-            self.id = schema['id']
+            self.id_ = schema['id']
         except KeyError:
             raise SchemaError("tried to load town object with no id field",
                               schema=schema)
@@ -127,7 +127,8 @@ class Town(Locale):
             'strings': load_strings(),
             'events': load_events()
         }
-        register_locale(self.id, self)
+        self.initialized = True
+        register_locale(self.id_, self)
 
     def get_state_template(self):
         return deepcopy(self.state)
