@@ -27,7 +27,7 @@ class Event(Immutable):
             ]
         except KeyError as e:
             raise SchemaError("encountered an unknown sequence type ``{0}`` "
-                              "while attempting to  load event ``{1}``"
+                              "while attempting to load event ``{1}``"
                               .format(e.args[0], schema['id']))
         global event_registry
         if schema['id'] in event_registry:
@@ -260,6 +260,100 @@ class EventImplode(EventSequenceItem):
         }
 
 
+class EventSetFlag(EventSequenceItem):
+    """ An event that enables a state flag
+    """
+    supported_scopes = [
+        'npc',
+        'monster',
+        'dungeon',
+        'town'
+    ]
+
+    def __init__(self, schema, condition=None):
+        super().__init__(schema, condition)
+        path_prefix = None
+        for key in schema:
+            if key in self.supported_scopes:
+                if path_prefix:
+                    keys = schema.keys()
+                    del keys['flag_id']
+                    del keys['type']
+                    raise SchemaError("unable to load event sequence set_flag "
+                                      "- a flag cannot be set on multiple "
+                                      "scopes at the same time [{0}]"
+                                      .format(', '.join(keys)))
+                path_prefix = 'world.{0}.{1}'.format(key, schema[key])
+                self.scope = {key: schema[key]}
+        if not path_prefix:
+            path_prefix = 'pc'
+        self.flag_id = schema['flag_id']
+        self.flag_state_path = '.'.join([path_prefix, 'flags', self.flag_id])
+        self.initialized = True
+
+    def do(self, player, world, interface):
+        player.set_state(state_path=self.flag_state_path, value=True)
+
+    def __dict__(self):
+        ret = {
+            'type': 'set_flag',
+            'flag_id': self.flag_id,
+        }
+        try:
+            ret.update(self.scope)
+        except AttributeError:
+            pass
+        return ret
+
+
+class EventUnsetFlag(EventSequenceItem):
+    """ An event that enables a state flag
+    """
+    supported_scopes = [
+        'npc',
+        'monster',
+        'dungeon',
+        'town'
+    ]
+
+    def __init__(self, schema, condition=None):
+        super().__init__(schema, condition)
+        path_prefix = None
+        for key in schema:
+            if key in self.supported_scopes:
+                if path_prefix:
+                    keys = schema.keys()
+                    del keys['flag_id']
+                    del keys['type']
+                    raise SchemaError("unable to load event sequence "
+                                      "unset_flag - a flag cannot be unset on "
+                                      "multiple scopes at the same time [{0}]"
+                                      .format(', '.join(keys)))
+                path_prefix = 'world.{0}.{1}'.format(key, schema[key])
+                self.scope = {key: schema[key]}
+        if not path_prefix:
+            path_prefix = 'pc'
+        self.flag_id = schema['flag_id']
+        self.flag_state_path = '.'.join([path_prefix, 'flags', self.flag_id])
+        self.initialized = True
+
+    def do(self, player, world, interface):
+        player.set_state(state_path=self.flag_state_path, value=False)
+
+    def __dict__(self):
+        ret = {
+            'type': 'unset_flag',
+            'flag_id': self.flag_id,
+        }
+        try:
+            ret.update(self.scope)
+        except AttributeError:
+            pass
+        return ret
+
+
+
+
 sequence_constructors = {
         'text': EventText,
         'branch': EventBranch,
@@ -267,4 +361,6 @@ sequence_constructors = {
         'prompt': EventPrompt,
         'npc': EventNpc,
         'implode': EventImplode,
+        'set_flag': EventSetFlag,
+        'unset_flag': EventUnsetFlag,
         }

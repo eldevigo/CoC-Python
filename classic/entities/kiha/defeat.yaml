@@ -3,8 +3,8 @@ type: event
 id: kiha_defeat_behavior
 sequence:
   - type: set_flag
+    npc: npc_kiha
     flag_id: pc_won_last_fight
-    flag_owner: npc_kiha
   - type: text
     text: >-
       "Kiha sways back and forth for a moment, then drops her axe with numb
@@ -50,7 +50,7 @@ sequence:
   - type: text
     text: >-
       'Now that she''s a captive audience, you could always talk to her.'
-  - prompt:
+  - type: prompt
     choices:
       - label: Masturbate
         branch: kiha_defeat_masturbate

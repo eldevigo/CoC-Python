@@ -87,5 +87,5 @@ type: event
 id: kiha_fight_begin
 sequence:
   - type: clear_flag
+    npc: npc_kiha
     flag_id: pc_won_last_fight
-    flag_owner: npc_kiha
