@@ -61,12 +61,14 @@ class Interface:
 
     @_fullscreen
     @_dump_buffer
-    def clear(self):
-        return self.blank_window()
+    def clear(self, clear_title=False):
+        return self.blank_window(clear_title)
 
     @_fullscreen
-    def blank_window(self):
+    def blank_window(self, clear_title=False):
         lines = window_height
+        if clear_title:
+            self.title('')
         with t.hidden_cursor():
             while lines:
                 with t.location(y=lines+1, x=3):
@@ -106,6 +108,8 @@ class Interface:
                 "values 'use', 'ignore', 'flush'")
         if buffer == 'flush':
             _screenbuffer = ''
+        if pause:
+            self.prompt('press SPACE to continue')
         self.blank_window()
         offset = 0
         lines = list()
@@ -142,9 +146,13 @@ class Interface:
                 return
 
     @_fullscreen
+    def choice(self, choices, title=None):
+        pass
+
+    @_fullscreen
     @_clean_up_errors
     def menu_choice(self, choices, title=None):
-        def draw_menu(renderable):
+        def draw_menu():
             self.blank_window()
             rendered = [
                     '({0}) - {1}'.format(a, b)
@@ -166,7 +174,7 @@ class Interface:
         selection_keys = '0123456789abcdefghijklmnoprstuvwxyz'
         renderable = list(zip(selection_keys,
                               choices[offset:window_height+offset]))
-        draw_menu(renderable)
+        draw_menu()
         while True:
             c = self.get_char()
             if c == '+':
@@ -177,7 +185,7 @@ class Interface:
                     offset = 0
                 renderable = list(zip(selection_keys,
                                       choices[offset:window_height+offset]))
-                draw_menu(renderable)
+                draw_menu()
                 continue
             if c == '-':
                 offset -= 3
@@ -185,7 +193,7 @@ class Interface:
                     offset = 0
                 renderable = list(zip(selection_keys,
                                       choices[offset:window_height+offset]))
-                draw_menu(renderable)
+                draw_menu()
                 continue
             if c == 'q':
                 raise ExitMenuException()
