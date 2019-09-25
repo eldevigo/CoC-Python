@@ -12,6 +12,8 @@ state:
     - considered_tribute
     - accepted_tribute
   encounter_event: kiha_first_encounter
+load_paths:
+  - 'kiha/*.yaml'
 
 ---
 type: monster

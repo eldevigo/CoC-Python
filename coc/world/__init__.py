@@ -19,6 +19,7 @@ class World(Immutable):
     def __init__(self, schema_root):
         super().__init__()
         file_paths = glob.glob(os.path.join(schema_root, '*.yaml'))
+        loaded_paths = list()
         subdirs = [d.name for d in os.scandir(schema_root) if d.is_dir()]
         for subdir in subdirs:
             file_paths.extend(glob.glob(
@@ -33,14 +34,26 @@ class World(Immutable):
             'pc'
         ]
         schema_sets = {key: [] for key in schema_types}
-        for path in file_paths:
+        while file_paths:
+            path = file_paths.pop()
+            loaded_paths.append(path)
             with open(path, 'r') as file:
-                gen = list(yaml.safe_load_all(file.read()))
+                loaded = list(yaml.safe_load_all(file.read()))
+            for schema in loaded:
+                try:
+                    for path_ in schema['load_paths']:
+                        additional_path = os.path.join(os.path.dirname(
+                            path), path_)
+                        if additional_path not in loaded_paths:
+                            file_paths.extend(glob.glob(additional_path))
+                            loaded_paths.append(additional_path)
+                except KeyError:
+                    pass
             try:
                 for schema_type in schema_types:
                     schema_sets[schema_type].extend(filter(
                         lambda x: x['type'] == schema_type,
-                        gen
+                        loaded
                     ))
             except KeyError:
                 raise SchemaError("An object schema at path ``{0}`` is "
@@ -73,10 +86,6 @@ class World(Immutable):
                     }
             self.world_template = deepcopy(world)
         ret = {
-                # 'entities': {
-                #     e.id: deepcopy(e.state) for e in entity.get_all()},
-                # 'locales': {
-                #     l.id: deepcopy(l.state) for l in locale.get_all()},
                 'pc': deepcopy(self.pc_template),
                 'world': world,
                 'game': dict()
@@ -136,8 +145,8 @@ class World(Immutable):
         return event.get_by_id(id_)
 
     @classmethod
-    def get_locale_events(cls, id, player):
-        return locale.get_by_id(id).run(player)
+    def get_locale_events(cls, id_, player):
+        return locale.get_by_id(id_).run(player)
 
 
 def load(schema_path):
