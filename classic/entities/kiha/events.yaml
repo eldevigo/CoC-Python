@@ -40,6 +40,7 @@ sequence:
         branch: kiha_tribute_suggested
       - label: Leave
         branch: kiha_fight_avoid
+  - type: implode
 parameters:
   - type: possession_name
     key: weapon
