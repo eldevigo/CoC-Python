@@ -1,6 +1,6 @@
 Scenes are stored as a list of sequence_elements. Currently used sequence_elements and their parameters are:
 
-render_text:
+text:
   text (str) <required>
   if (condition)
 

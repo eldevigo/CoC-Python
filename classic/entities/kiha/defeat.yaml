@@ -5,14 +5,14 @@ sequence:
   - type: set_flag
     flag_id: pc_won_last_fight
     flag_owner: npc_kiha
-  - type: render_text
+  - type: text
     text: >-
       "Kiha sways back and forth for a moment, then drops her axe with numb
       hands.  As soon as she does, the hot glow of the weapon's cutting edge
       fades to silver, and the weapon lands with a heavy 'thunk'{like} in the
       dirt.  The dragoness drops to her knees and slumps back against a tree,
       her limbs trembling {thusly} as she tries to rise."
-  - type: render_text
+  - type: text
     text: >-
       '"You... can''t make me like it!," she shouts, struggling with all her
       might to keep her hands away from her genitals.  Somehow, she seems to be
@@ -20,34 +20,34 @@ sequence:
     if:
       resource: lust
       ge: 100
-  - type: render_text
+  - type: text
     text: >-
       '"You... you... haven''t... beaten me," she mutters, even though it''s
       quite clear that you have.'
     if:
       resource: lust
       lt: 100
-  - type: render_text
+  - type: text
     text: >-
       '  What do you do with the wannabe dragon now that you''ve taken her down
       a peg?'
-  - type: render_text
+  - type: text
     text: >-
       'You could forcibly masturbate her.'
-  - type: render_text
+  - type: text
     text: >-
       'You could use her tail as a dildo.'
     if:
       - pc: is_horny
       - pc: has_vagina
-  - type: render_text
+  - type: text
     text: >-
       'You could fuck her vagina{and_ass}.'
     if:
       - pc: is_horny
       - pc: is_piv_compatible
         entity: kiha_npc
-  - type: render_text
+  - type: text
     text: >-
       'Now that she''s a captive audience, you could always talk to her.'
   - prompt:
@@ -98,13 +98,13 @@ parameters:
 type: event
 id: kiha_defeat_masturbate
 sequence:
-  - type: render_text
+  - type: text
     text: >-
       'You walk towards the draconic woman, removing your {armor} as you observe
       her firm, {attitude} figure slumping against the weathered bark behind
       her.  She eyes you carefully, trying to comprehend the situation before
       catching note of your {genitals}.'
-  - type: render_text
+  - type: text
     text: >-
       '"{bluster}"  Today, however, you don''t have any plans to fuck her
       directly{sadtrombone}.  Without saying a word, you walk behind her,
@@ -120,7 +120,7 @@ sequence:
       lower as she begins to reciprocate the notion.  You lock lips for what
       seems like ages, long enough that when you part, a single rope of saliva
       remains, connecting the two of you together.'
-  - type: render_text
+  - type: text
     text: >-
       'The girl tries to speak, but you reach down towards her nether region,
       placing two fingers along the smooth of her belly and slowly creeping
@@ -135,7 +135,7 @@ sequence:
       moans ultimately failing as an odd yelp or gasp escapes her pouting lips.
       With a gentle push you enter inside her, your panting toy clamping her
       legs shut against your probing fingers.'
-  - type: render_text
+  - type: text
     text: >-
       'You notice the dragon-girl''s warm breath pervade the air as you feel the
       warmth of her insides, her slick tongue beginning to drool out of her
@@ -156,7 +156,7 @@ sequence:
       you like a velvet furnace.  You reach down and kiss her a second time,
       deciding to go about it more passionately as you probe your tongue inside,
       wrapping it around her own.'
-  - type: render_text
+  - type: text
     text: >-
       'There''s nothing your hot and bothered slave can do outside of melting
       underneath the heat of your own body, the irony of the dragon-girl losing
@@ -165,7 +165,7 @@ sequence:
       intertwined as a single being of pure lust under the shade of the tree,
       which ends as soon as it began when the draconic beast-girl shudders in
       pleasure, signalling her release.'
-  - type: render_text
+  - type: text
     text: >-
       'Her moist juices flush from beneath her, drenching your fingers in her
       essence.  She slowly removes her lips from yours, moving closer towards
@@ -176,7 +176,7 @@ sequence:
     event: orgasm
     if:
       pc: has_dick
-  - type: render_text
+  - type: text
     text: >-
       '"I... hate you... " she whispers, before turning in for a deep slumber.
       You watch her soft face as she snores, graceful as a pig, before walking
@@ -280,7 +280,7 @@ parameters:
 type: event
 id: kiha_defeat_tail
 sequence:
-  - type: render_text
+  - type: text
     text: >-
       'You approach the {attitude} dragoness full of wicked ideas.  For her
       part, she looks up at you with a defiant gaze, as if it would somehow
@@ -291,7 +291,7 @@ sequence:
       face with her own scaly hind-bits before you drop it.  You know just how
       you''ll put that rudder to use, but first you''ve got to shuck your
       {armor}."'
-  - type: render_text
+  - type: text
     text: >-
       'The gear lands behind you in a bed of moss{silly}  Now nude, you sway
       your {hips} back and forth sensually, forcing Kiha to watch your body

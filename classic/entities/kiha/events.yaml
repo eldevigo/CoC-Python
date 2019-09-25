@@ -5,7 +5,7 @@ sequence:
   - type: set_default_event
     npc: npc_kiha
     encounter_id: kiha_forest_behavior
-  - type: render_text
+  - type: text
     text: >-
       'An imposing figure drops out of the gnarled swamp trees, spraying loam
       and moss everywhere as it impacts the ground.  You immediately put up your
@@ -19,7 +19,7 @@ sequence:
       with inky black slits in the middle.  Dark red scales run up her arms and
       legs to meet on her back.  A powerful reptilian tail hangs down behind
       her, whipping back and forth with dangerous strength.'
-  - type: render_text
+  - type: text
     text: >-
       '"Eyes up here, {gender_slur}" commands the draconic woman - and she''s
       definitely a woman; the dark-skinned entrance between her muscled legs is
@@ -56,12 +56,12 @@ parameters:
 type: event
 id: kiha_forest_encounter
 sequence:
-  - type: render_text
+  - type: text
     text: >-
       'A nearby tree suddenly explodes in a shower of splintering wood and
       burning embers.  Kiha steps through the wreckage with her characteristic
       double-sided axe.'
-  - type: render_text
+  - type: text
     text: >-
       '"Don''t even start," she commands, advancing on you as she continues, "I
       told you to avoid my domain and yet you ignored my imperative and
@@ -71,7 +71,7 @@ sequence:
     event_id: kiha_fight_challenge
     if:
       flag: tribute_suggested
-  - type: render_text
+  - type: text
     text: 'If you hurry, you might get a word in edge-wise.  What do you do?'
   - type: prompt
     choices:
