@@ -103,28 +103,40 @@ class Session(COCClass):
         # Also need a handler that is called when an event sequence terminates,
         # which calls the visit event on the current locale
         while True:
+            self.interface.clear(clear_title=True)
             current_locale = locales.pop()
-            current_events = [get_event_by_id(event) for
-                              event in self.player.visit(current_locale)]
+            current_events = list(
+                reversed(
+                    [get_event_by_id(event) for
+                     event in
+                     self.player.visit(current_locale)]
+                )
+            )
             while current_events:
                 current_event = current_events.pop()
                 event_sequence = current_event.run(self.player.get_state)
-                for item in event_sequence:
-                    next_ = item.do(
+                for sequence_item in event_sequence:
+                    push = sequence_item.do(
                         self.player,
                         self.world,
                         self.interface
                     )
-                    if isinstance(next_, Locale):
-                        locales.append(next_)
-                    elif isinstance(next_, Event):
-                        current_events.append(next_)
-                    elif next_ is not None:
-                        raise IncorrectObjectTypeError(
-                            "Sequence in event ``{0}`` returned an "
-                            "unsupported next object type ``{1}``"
-                            .format(current_event.id, type(next_)))
+                    if push is None:
+                        continue
+                    elif not isinstance(push, list):
+                        push = [push]
+                    for item in push:
+                        if isinstance(item, Locale):
+                            locales.append(item)
+                        elif isinstance(item, Event):
+                            current_events.append(item)
+                        else:
+                            raise IncorrectObjectTypeError(
+                                "Sequence in event ``{0}`` returned an "
+                                "unsupported next object type ``{1}``"
+                                .format(current_event.id, type(push)))
             if not locales:
+                # TODO: remove this print statement
                 print("Ran out of locales on the stack, reattaching the last"
                       " one visited")
                 locales.append(current_locale)

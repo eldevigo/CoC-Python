@@ -123,7 +123,7 @@ class EventBranch(EventSequenceItem):
         self.initialized = True
 
     def do(self, player, world, interface):
-        raise NotImplementedError()
+        return get_by_id(self.event)
 
     def __dict__(self):
         return {
@@ -146,7 +146,14 @@ class EventPrompt(EventSequenceItem):
         self.initialized = True
 
     def do(self, player, world, interface):
-        raise NotImplementedError()
+        choice = interface.menu_choice(
+            [choice['label'] for choice in self.choices]
+        )
+        for item in self.choices:
+            if item['label'] == choice:
+                return get_by_id(item['branch'])
+        raise RuntimeError("interface a selection that wasn't in the list "
+                           "of options")
 
     def __dict__(self):
         return {
@@ -223,7 +230,10 @@ class EventNpc(EventSequenceItem):
         self.initialized = True
 
     def do(self, player, world, interface):
-        raise NotImplementedError()
+        npc_events = player.get_state(
+            'world.npc.{0}.events'.format(self.npc_id)
+        )
+        return [get_by_id(event_id) for event_id in npc_events]
 
     def __dict__(self):
         return {
