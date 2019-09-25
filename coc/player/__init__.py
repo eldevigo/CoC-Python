@@ -27,8 +27,8 @@ class Player(Immutable):
         resolved = list()
         for token in path_tokens:
             try:
-                scope = scope[token]
                 resolved.append(token)
+                scope = scope[token]
             except KeyError:
                 raise StateNotFoundError(
                         msg="unable to resolve state path ``{0}``"
