@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from coc.world.locale import Locale, register_locale
-from coc.world.eventstream import is_loaded as is_event_loaded
+from coc.world.eventstream import is_eventstream_loaded
 from coc.exceptions import ObjectNotFoundError, SchemaError
 
 
@@ -89,7 +89,7 @@ class Town(Locale):
             events = list()
             try:
                 for event_id in schema['state']['events']:
-                    if not is_event_loaded(event_id):
+                    if not is_eventstream_loaded(event_id):
                         raise ObjectNotFoundError(
                             "tried to load town object (id ``{0}``) with a "
                             "nonexistant event_id in its event registry - "
@@ -99,9 +99,6 @@ class Town(Locale):
                     events.append(event_id)
             except KeyError as e:
                 if e.args[0] == 'events':
-                    # This is an error because eventless locales are not
-                    # interactable and this error indicates that no events are
-                    # attached to this town.
                     raise SchemaError(
                         "tried to load town object (id ``{0}``) with no"
                         " registered events".format(self.id_),

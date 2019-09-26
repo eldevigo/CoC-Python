@@ -1,6 +1,6 @@
 from coc.exceptions import ObjectNotFoundError, SchemaError
 from coc.world.entity import Entity
-from coc.world.eventstream import is_loaded as is_event_loaded
+from coc.world.eventstream import get_eventstream_by_id
 
 npc_registry = dict()
 
@@ -89,13 +89,15 @@ class NPC(Entity):
             events = list()
             try:
                 event_id = schema['state']['encounter_event']
-                if not is_event_loaded(event_id):
+                try:
+                    get_eventstream_by_id(event_id)
+                except ObjectNotFoundError as e:
                     raise ObjectNotFoundError(
                         "tried to load npc object (id ``{0}``) with a "
                         "nonexistant event_id in its event registry - "
                         "requested id was ``{1}``"
-                            .format(self.id_, event_id),
-                        schema=schema)
+                        .format(self.id_, event_id),
+                        schema=schema) from e
                 events.append(event_id)
             except KeyError as e:
                 if e.args[0] == 'events':

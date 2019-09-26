@@ -133,7 +133,7 @@ class World(Immutable):
 
     @staticmethod
     def _get_locale_by_id(id_):
-        return locale.get_by_id(id_)
+        return locale.get_locale_by_id(id_)
 
     @staticmethod
     def _get_npc_by_id(id_):
@@ -149,7 +149,7 @@ class World(Immutable):
 
     @classmethod
     def get_locale_events(cls, id_, player):
-        return locale.get_by_id(id_).run(player)
+        return locale.get_locale_by_id(id_).run(player)
 
 
 def load(schema_path):

@@ -1,11 +1,11 @@
 import yaml
 import os
 
-from coc import Immutable
+from coc import COCClass
 from coc.exceptions import StateNotFoundError
 
 
-class Player(Immutable):
+class Player(COCClass):
     """ Contains all state for an in-progress game, including world state, NPC
     interaction state, PC status effects and possessions, etc.
     Should deal only with state tracking and persistence. All runtime logic
@@ -18,8 +18,6 @@ class Player(Immutable):
         self.world_id = world_id
         self.state = state
         self.current_locale = None
-        self.mutable.append('current_locale')
-        self.initialized = True
 
     def get_state(self, state_path):
         path_tokens = state_path.split('.')

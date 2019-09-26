@@ -8,9 +8,8 @@ from coc import player as playerlib
 from coc.exceptions import ExitMenuException, LoadError, \
     IncorrectObjectTypeError
 from coc.session import game_load, initialization
-from coc.world.locale import Locale
-from coc.world.eventstream import EventStream
-from coc.world.eventstream import get_by_id as get_event_by_id
+from coc.world.locale import get_locale_by_id
+from coc.world.eventstream import get_eventstream_by_id
 
 
 class Session(COCClass):
@@ -105,18 +104,18 @@ class Session(COCClass):
         while True:
             self.interface.clear(clear_title=True)
             current_locale = locales.pop()
-            current_events = list(
+            eventstreams = list(
                 reversed(
-                    [get_event_by_id(event) for
+                    [get_eventstream_by_id(event) for
                      event in
                      self.player.visit(current_locale)]
                 )
             )
-            while current_events:
-                current_event = current_events.pop()
-                event_sequence = current_event.run(self.player.get_state)
-                for sequence_item in event_sequence:
-                    push = sequence_item.do(
+            while eventstreams:
+                current_eventstream = eventstreams.pop()
+                events = current_eventstream.run(self.player.get_state)
+                for event in events:
+                    push = event.do(
                         self.player,
                         self.world,
                         self.interface
@@ -126,15 +125,15 @@ class Session(COCClass):
                     elif not isinstance(push, list):
                         push = [push]
                     for item in push:
-                        if isinstance(item, Locale):
-                            locales.append(item)
-                        elif isinstance(item, EventStream):
-                            current_events.append(item)
+                        if item['type'] == 'locale':
+                            locales.append(get_locale_by_id(item['id']))
+                        elif item['type'] == 'eventstream':
+                            eventstreams.append(get_eventstream_by_id(item['id']))
                         else:
                             raise IncorrectObjectTypeError(
                                 "Sequence in event ``{0}`` returned an "
                                 "unsupported next object type ``{1}``"
-                                .format(current_event.id, type(push)))
+                                .format(current_eventstream.id_, item['type']))
             if not locales:
                 # TODO: remove this print statement
                 locales.append(current_locale)

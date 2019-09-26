@@ -31,7 +31,7 @@ class Locale(EventContext):
 #   registry instead, and come up with a scheme to derive the locale type.
 # Maybe it makes more sense just to brute force search. Probably there won't be
 #   that many locales to handle.
-def get_by_id(id_):
+def get_locale_by_id(id_):
     try:
         return locale_registry[id_]
     except KeyError:
