@@ -11,9 +11,9 @@ state:
     - at_camp
 
 ---
-type: event
+type: event_stream
 id: discover_camp
-sequence:
+events:
   - type: text
     text: "You found the perfect place to camp!"
   - type: text
@@ -25,9 +25,9 @@ sequence:
   - type: implode
 
 ---
-type: event
+type: event_stream
 id: at_camp
-sequence:
+events:
   - type: prompt
     choices:
       - label: "Explore"
@@ -36,15 +36,15 @@ sequence:
         branch: die
 
 ---
-type: event
+type: event_stream
 id: explore
-sequence:
+events:
   - type: text
     text: "You explore all day, but find nothing."
 
 ---
-type: event
+type: event_stream
 id: die
-sequence:
+events:
   - type: text
     text: "You die gruesomely."

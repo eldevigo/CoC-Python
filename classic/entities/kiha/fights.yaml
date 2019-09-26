@@ -1,7 +1,7 @@
 ---
-type: event
+type: event_stream
 id: kiha_fight_avoid
-sequence:
+events:
   - type: text
     text: >-
       'You nod and step back, retreating back towards camp.  You''ve no desire
@@ -9,9 +9,9 @@ sequence:
 
 ---
 # Lead-in to a fight if you challenge kiha on your first encounter
-type: event
+type: event_stream
 id: kiha_fight_challenge
-sequence:
+events:
   - type: text
     text: >-
       'You step closer and proclaim that you go where you please.  Kiha snorts
@@ -22,9 +22,9 @@ sequence:
 
 ---
 # Lead-in to a fight if you question kiha on your first encounter
-type: event
+type: event_stream
 id: kiha_fight_defensive
-sequence:
+events:
   - type: text
     text: >-
       'You ask why she''s trying to drive you off.  Confusion breaks out across
@@ -45,9 +45,9 @@ sequence:
     monster_id: monster_kiha
 
 ---
-type: event
+type: event_stream
 id: kiha_fight_reprisal
-sequence:
+events:
   - type: text
     text: >-
       'Kiha plummets from the sky, slamming down into the mossy earth with
@@ -62,9 +62,9 @@ sequence:
     monster_id: monster_kiha
 
 ---
-type: event
+type: event_stream
 id: kiha_fight_questioned
-sequence:
+events:
   - type: text
     text: >-
       'You ask why she changed her mind about your idea.  Kiha''s face screws up
@@ -83,9 +83,9 @@ sequence:
     monster_id: monster_kiha
 
 ---
-type: event
+type: event_stream
 id: kiha_fight_begin
-sequence:
+events:
   - type: clear_flag
     npc: npc_kiha
     flag_id: pc_won_last_fight

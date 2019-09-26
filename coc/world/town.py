@@ -1,7 +1,7 @@
 from copy import deepcopy
 
 from coc.world.locale import Locale, register_locale
-from coc.world.event import is_loaded as is_event_loaded
+from coc.world.eventstream import is_loaded as is_event_loaded
 from coc.exceptions import ObjectNotFoundError, SchemaError
 
 

@@ -3,64 +3,64 @@ from coc import Immutable
 from coc.exceptions import LoadError, ObjectNotFoundError, SchemaError
 from coc.world.locale import get_by_id as get_locale_by_id
 
-event_registry = dict()
+eventstream_registry = dict()
 
 
-class Event(Immutable):
+class EventStream(Immutable):
     """ Represents a narrative sequence, including conditional components and
     usually terminating at a conditional branch, a fight, or a decision menu.
     """
     def __init__(self, schema):
-        def load_sequence_item(seq_schema):
+        def load_event(event_schema):
             try:
-                seq_type = seq_schema['type']
+                seq_type = event_schema['type']
             except TypeError:
                 seq_type = 'text'
-                seq_schema = {'text': seq_schema}
-            global sequence_constructors
-            return sequence_constructors[seq_type](seq_schema, self)
+                event_schema = {'text': event_schema}
+            global _event_constructors
+            return _event_constructors[seq_type](event_schema, self)
 
         super().__init__()
         self.id_ = schema['id']
         try:
-            self.sequence = [
-                    load_sequence_item(item) for item in schema['sequence']
+            self.events = [
+                    load_event(item) for item in schema['events']
             ]
         except KeyError as e:
-            raise SchemaError("encountered an unknown sequence type ``{0}`` "
+            raise SchemaError("encountered an unknown event type ``{0}`` "
                               "while attempting to load event ``{1}``"
                               .format(e.args[0], schema['id']))
-        global event_registry
-        if schema['id'] in event_registry:
-            raise LoadError("attempted to load event ``{0}`` but that event id"
-                            " already exists".format(schema['id']))
+        global eventstream_registry
+        if schema['id'] in eventstream_registry:
+            raise LoadError("attempted to load event_stream ``{0}`` but that "
+                            "event id already exists".format(schema['id']))
         self.initialized = True
-        event_registry[self.id_] = self
+        eventstream_registry[self.id_] = self
 
     def get_id(self):
         return self.id_
 
     def run(self, state_func):
-        for item in self.sequence:
+        for item in self.events:
             if item.check_condition(state_func):
                 yield item
 
     def __repr__(self):
         return repr({
             'id': self.id_,
-            'sequence': [
-                dict(item) for item in self.sequence
+            'events': [
+                dict(item) for item in self.events
             ]
         })
 
 
 def get_all():
-    return event_registry.values()
+    return eventstream_registry.values()
 
 
 def get_by_id(id_):
     try:
-        return event_registry[id_]
+        return eventstream_registry[id_]
     except KeyError as e:
         raise ObjectNotFoundError("event ``" + id_ +
                                   "`` was not found in the event registry"
@@ -68,10 +68,10 @@ def get_by_id(id_):
 
 
 def is_loaded(id_):
-    return id_ in event_registry
+    return id_ in eventstream_registry
 
 
-class EventSequenceItem(Immutable, ABC):
+class Event(Immutable, ABC):
     """ Parent class for all event sequence items - represents a single step in
     an event stream.
     """
@@ -94,7 +94,7 @@ class EventSequenceItem(Immutable, ABC):
         pass
 
 
-class EventText(EventSequenceItem):
+class EventText(Event):
     """ An event sequence item containing a block of text. This is the core
     event sequence type for game content.
     """
@@ -117,7 +117,7 @@ class EventText(EventSequenceItem):
         }
 
 
-class EventBranch(EventSequenceItem):
+class EventBranch(Event):
     """ An event item that jumps to another Event or EventStream. This is the
     core unit of event chaining and flow control.
     """
@@ -140,7 +140,7 @@ class EventBranch(EventSequenceItem):
         }
 
 
-class EventPrompt(EventSequenceItem):
+class EventPrompt(Event):
     """ An event that presents the user with a menu of choices and returns the
     selection, after optionally printing a prompt message.
     """
@@ -170,7 +170,7 @@ class EventPrompt(EventSequenceItem):
         }
 
 
-class EventModifyResource(EventSequenceItem):
+class EventModifyResource(Event):
     """ An event that modifies existing states, e.g. counters or strings.
     """
     def __init__(self, schema, event, condition=None):
@@ -184,7 +184,7 @@ class EventModifyResource(EventSequenceItem):
         raise NotImplementedError()
 
 
-class EventAppendResource(EventSequenceItem):
+class EventAppendResource(Event):
     """ An event that adds a new resource to an existing set of states on an
     object, at the end of the list.
     """
@@ -199,7 +199,7 @@ class EventAppendResource(EventSequenceItem):
         raise NotImplementedError()
 
 
-class EventPrependResource(EventSequenceItem):
+class EventPrependResource(Event):
     """ An event that adds a new resource to an existing set of states on an
     object, at the beginning of the list.
     """
@@ -214,7 +214,7 @@ class EventPrependResource(EventSequenceItem):
         raise NotImplementedError()
 
 
-class EventRemoveResource(EventSequenceItem):
+class EventRemoveResource(Event):
     """ An event that deletes a resource from the set of states on an existing
     object.
     """
@@ -229,7 +229,7 @@ class EventRemoveResource(EventSequenceItem):
         raise NotImplementedError()
 
 
-class EventNpc(EventSequenceItem):
+class EventNpc(Event):
     """ An event that represents an encounter with an NPC.
     """
     def __init__(self, schema, event, condition=None):
@@ -254,8 +254,8 @@ class EventNpc(EventSequenceItem):
         }
 
 
-class EventImplode(EventSequenceItem):
-    """ An event sequence that de-registers the event from the current event
+class EventImplode(Event):
+    """ An event that de-registers the event from the current event
     context, thus preventing it from happening in the same way in the future.
     """
     def __init__(self, schema, event, condition=None):
@@ -280,8 +280,8 @@ class EventImplode(EventSequenceItem):
         }
 
 
-class EventRetire(EventSequenceItem):
-    """ An event sequence that de-registers the event from the current event
+class EventRetire(Event):
+    """ An event that de-registers the event from the current event
     context, thus preventing it from happening in the same way in the future.
     """
     def __init__(self, schema, event, condition=None):
@@ -307,7 +307,7 @@ class EventRetire(EventSequenceItem):
         }
 
 
-class EventSetFlag(EventSequenceItem):
+class EventSetFlag(Event):
     """ An event that enables a state flag
     """
     supported_scopes = [
@@ -326,9 +326,9 @@ class EventSetFlag(EventSequenceItem):
                     keys = schema.keys()
                     del keys['flag_id']
                     del keys['type']
-                    raise SchemaError("unable to load event sequence set_flag "
-                                      "- a flag cannot be set on multiple "
-                                      "scopes at the same time [{0}]"
+                    raise SchemaError("unable to load event set_flag - a flag "
+                                      "cannot be set on multiple scopes at "
+                                      "the same time [{0}]"
                                       .format(', '.join(keys)))
                 path_prefix = 'world.{0}.{1}'.format(key, schema[key])
                 self.scope = {key: schema[key]}
@@ -357,7 +357,7 @@ class EventSetFlag(EventSequenceItem):
         return ret
 
 
-class EventClearFlag(EventSequenceItem):
+class EventClearFlag(Event):
     """ An event that enables a state flag
     """
     supported_scopes = [
@@ -376,10 +376,10 @@ class EventClearFlag(EventSequenceItem):
                     keys = schema.keys()
                     del keys['flag_id']
                     del keys['type']
-                    raise SchemaError("unable to load event sequence "
-                                      "clear_flag - a flag cannot be cleared "
-                                      "on multiple scopes at the same time "
-                                      "[{0}]".format(', '.join(keys)))
+                    raise SchemaError("unable to load event clear_flag - a "
+                                      "flag cannot be cleared on multiple "
+                                      "scopes at the same time [{0}]"
+                                      .format(', '.join(keys)))
                 path_prefix = 'world.{0}.{1}'.format(key, schema[key])
                 self.scope = {key: schema[key]}
         if not path_prefix:
@@ -407,7 +407,7 @@ class EventClearFlag(EventSequenceItem):
         return ret
 
 
-class EventDoTrigger(EventSequenceItem):
+class EventDoTrigger(Event):
     def __init__(self, schema, event, condition=None):
         super().__init__(schema, condition)
 
@@ -418,7 +418,7 @@ class EventDoTrigger(EventSequenceItem):
         raise NotImplementedError()
 
 
-class EventBeginFight(EventSequenceItem):
+class EventBeginFight(Event):
     def __init__(self, schema, event, condition=None):
         super().__init__(schema, condition)
 
@@ -429,7 +429,7 @@ class EventBeginFight(EventSequenceItem):
         raise NotImplementedError()
 
 
-class EventSetEncounterEvent(EventSequenceItem):
+class EventSetEncounterEvent(Event):
     def __init__(self, schema, event, condition=None):
         try:
             self.npc = schema['npc']
@@ -455,7 +455,7 @@ class EventSetEncounterEvent(EventSequenceItem):
         }
 
 
-sequence_constructors = {
+_event_constructors = {
         'text': EventText,
         'branch': EventBranch,
         'modify_resource': EventModifyResource,

@@ -1,7 +1,7 @@
 ---
-type: event
+type: event_stream
 id: kiha_tribute_suggested
-sequence:
+events:
   - type: text
     text: >-
       'You jingle your gem pouch and ask if you could pay her to allow you
@@ -12,9 +12,9 @@ sequence:
     flag_id: considered_tribute
 
 ---
-type: event
+type: event_stream
 id: kiha_tribute_accepted
-sequence:
+events:
   - type: text
     text: >-
       'Kiha steps out from behind a tree with her axe on her back and her arms
@@ -27,9 +27,9 @@ sequence:
       your idea?'
 
 ---
-type: event
+type: event_stream
 id: kiha_tribute_demanded
-sequence:
+events:
   - type: text
     text: >-
       'Kiha steps out from behind a tree with her axe on her back and her arms
@@ -57,9 +57,9 @@ sequence:
         branch: kiha_fight_avoid
 
 ---
-type: event
+type: event_stream
 id: kiha_tribute_paid
-sequence:
+events:
   - type: text
     text: >-
       'You sigh and pay her 200 gems.  She doesn''t even mention that it was

@@ -1,6 +1,6 @@
 from coc.exceptions import ObjectNotFoundError, SchemaError
 from coc.world.entity import Entity
-from coc.world.event import is_loaded as is_event_loaded
+from coc.world.eventstream import is_loaded as is_event_loaded
 
 npc_registry = dict()
 

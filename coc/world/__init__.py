@@ -5,7 +5,7 @@ import hashlib
 from copy import deepcopy
 
 from coc import Immutable
-from coc.world import npc, monster, event, town, dungeon, locale
+from coc.world import npc, monster, eventstream, town, dungeon, locale
 from coc.exceptions import SchemaError
 
 
@@ -25,7 +25,7 @@ class World(Immutable):
             file_paths.extend(glob.glob(
                     os.path.join(schema_root, subdir, '*.yaml')))
         schema_types = [
-            'event',
+            'event_stream',
             'town',
             'dungeon',
             'npc',
@@ -101,7 +101,7 @@ class World(Immutable):
                 'dungeon': dungeon.Dungeon,
                 'npc': npc.NPC,
                 'monster': monster.Monster,
-                'event': event.Event,
+                'event_stream': eventstream.EventStream,
                 'world': self._load_world_schema,
                 'pc': self._load_pc_schema
                 }
@@ -145,7 +145,7 @@ class World(Immutable):
 
     @staticmethod
     def _get_event_by_id(id_):
-        return event.get_by_id(id_)
+        return eventstream.get_by_id(id_)
 
     @classmethod
     def get_locale_events(cls, id_, player):

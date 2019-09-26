@@ -1,7 +1,7 @@
 ---
-type: event
+type: event_stream
 id: kiha_fight_victory
-sequence:
+events:
   - type: text
     text: >-
 

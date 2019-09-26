@@ -1,7 +1,7 @@
 ---
-type: event
+type: event_stream
 id: kiha_defeat_behavior
-sequence:
+events:
   - type: set_flag
     npc: npc_kiha
     flag_id: pc_won_last_fight
@@ -95,9 +95,9 @@ parameters:
     val: ' and ass'
 
 ---
-type: event
+type: event_stream
 id: kiha_defeat_masturbate
-sequence:
+events:
   - type: text
     text: >-
       'You walk towards the draconic woman, removing your {armor} as you observe
@@ -277,9 +277,9 @@ parameters:
     you hard enough to cause you to ejaculate against her backside'
 
 ---
-type: event
+type: event_stream
 id: kiha_defeat_tail
-sequence:
+events:
   - type: text
     text: >-
       'You approach the {attitude} dragoness full of wicked ideas.  For her
@@ -328,19 +328,19 @@ parameters:
       resource: 
 
 ---
-type: event
+type: event_stream
 id: kiha_defeat_piv
-sequence:
+events:
   - asdf
 
 ---
-type: event
+type: event_stream
 id: kiha_defeat_pia
-sequence:
+events:
   - asdf
 
 ---
-type: event
+type: event_stream
 id: kiha_defeat_talk
-sequence:
+events:
   - asdf

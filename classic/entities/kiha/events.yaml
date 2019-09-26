@@ -1,7 +1,7 @@
 ---
-type: event
+type: event_stream
 id: kiha_first_encounter
-sequence:
+events:
   - type: set_encounter_event
     npc: npc_kiha
     event_id: kiha_forest_behavior
@@ -53,9 +53,9 @@ parameters:
     alt: 'slut-bag'
 
 ---
-type: event
+type: event_stream
 id: kiha_forest_encounter
-sequence:
+events:
   - type: text
     text: >-
       'A nearby tree suddenly explodes in a shower of splintering wood and
@@ -85,9 +85,9 @@ sequence:
         branch: kiha_fight_avoid
 
 ---
-type: event
+type: event_stream
 id: kiha_forest_behavior
-sequence:
+events:
   - type: branch
     event_id: kiha_
     if:
@@ -122,9 +122,9 @@ sequence:
     event_id: kiha_forest_encounter
 
 ---
-type: event
+type: event_stream
 id: kiha_stays_away
-sequence:
+events:
   - type: modify_resource
     res: tribute_duration
     subtract: 1

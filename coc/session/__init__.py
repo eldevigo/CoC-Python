@@ -9,8 +9,8 @@ from coc.exceptions import ExitMenuException, LoadError, \
     IncorrectObjectTypeError
 from coc.session import game_load, initialization
 from coc.world.locale import Locale
-from coc.world.event import Event
-from coc.world.event import get_by_id as get_event_by_id
+from coc.world.eventstream import EventStream
+from coc.world.eventstream import get_by_id as get_event_by_id
 
 
 class Session(COCClass):
@@ -128,7 +128,7 @@ class Session(COCClass):
                     for item in push:
                         if isinstance(item, Locale):
                             locales.append(item)
-                        elif isinstance(item, Event):
+                        elif isinstance(item, EventStream):
                             current_events.append(item)
                         else:
                             raise IncorrectObjectTypeError(
@@ -137,6 +137,4 @@ class Session(COCClass):
                                 .format(current_event.id, type(push)))
             if not locales:
                 # TODO: remove this print statement
-                print("Ran out of locales on the stack, reattaching the last"
-                      " one visited")
                 locales.append(current_locale)
