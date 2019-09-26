@@ -3,8 +3,6 @@ import os
 
 from coc import Immutable
 from coc.exceptions import StateNotFoundError
-from coc.world.locale import get_by_id as get_locale_by_id
-from coc.world.locale import Locale
 
 
 class Player(Immutable):
@@ -19,6 +17,8 @@ class Player(Immutable):
         self.name = name
         self.world_id = world_id
         self.state = state
+        self.current_locale = None
+        self.mutable.append('current_locale')
         self.initialized = True
 
     def get_state(self, state_path):
@@ -64,6 +64,7 @@ class Player(Immutable):
         :type locale: str
         :return:
         """
+        self.current_locale = locale
         return self.get_state('world.locale.{0}.events'.format(locale))
 
 

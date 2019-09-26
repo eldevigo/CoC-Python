@@ -9,20 +9,19 @@ class Entity(EventContext):
     npcs, etc.)
     """
     def __init__(self, schema):
-        super().__init__()
+        super().__init__(schema)
         state_defaults = {
                 'counters': 0,
                 'flags': False
                 }
         self.state = dict()
         try:
-            self.id = schema['id']
-            self.name = schema['name']
             self.state['encounter_event_id'] = \
                 schema['state']['encounter_event']
-        except KeyError as e:
-            raise SchemaError("entity schema missing required field ``{0}``"
-                              .format(e.args[0]), schema=schema) from e
+        except KeyError:
+            raise SchemaError("{0} schema missing required initial state "
+                              "``encounter_event``".format(type(self)),
+                              schema=schema)
         try:
             self.event_path = schema['load_events']
         except KeyError:
@@ -34,6 +33,9 @@ class Entity(EventContext):
                 }
             except KeyError:
                 pass
+
+    def get_id(self):
+        return self.id_
 
 
 def get_all():

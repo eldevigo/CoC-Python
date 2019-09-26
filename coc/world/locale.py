@@ -11,19 +11,19 @@ class Locale(EventContext):
 
 
     def __init__(self, schema):
-        super().__init__()
-
+        super().__init__(schema)
 
     def visit(self, player):
         return self.get_event_streams(player)
 
-
     def get_event_streams(self, player):
         raise NotImplementedError()
 
-
     def get_state_template(self):
         raise NotImplementedError()
+
+    def get_id(self):
+        return self.id_
 
 
 # TODO: Let's come up with a more elegant solution for this. Maybe it makes

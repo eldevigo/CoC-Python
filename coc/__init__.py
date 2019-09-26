@@ -1,5 +1,7 @@
-from coc.exceptions import ImmutablePropertyError
 from abc import ABC
+from copy import deepcopy
+
+from coc.exceptions import ImmutablePropertyError, SchemaError
 
 
 class COCClass(ABC):
@@ -13,7 +15,7 @@ class Immutable(COCClass):
     """
     def __init__(self):
         self.initialized = False
-        self.mutable = []
+        self.mutable = list()
         super().__setattr__('initialized', False)
         self.immutable = list()
 
@@ -31,12 +33,19 @@ class EventContext(Immutable):
     """ Common base class for world objects that have events associated with
     them. Used mainly to handle event loading.
     """
-    def __init__(self):
+    def __init__(self, schema):
         super().__init__()
-        self._events_loaded = False
+        self.state = {}
+        try:
+            self.id_ = schema['id']
+        except KeyError:
+            raise SchemaError("{0} schema missing required field ``id``"
+                              .format(type(self)), schema=schema)
+        try:
+            self.name = schema['name']
+        except KeyError:
+            raise SchemaError("{0} schema missing required field ``name``"
+                              .format(type(self)), schema=schema)
 
-    def load_events(self):
-        if not self._events_loaded:
-            self._events_loaded = True
-            return self.event_path
-        return False
+    def get_state_template(self):
+        return deepcopy(self.state)

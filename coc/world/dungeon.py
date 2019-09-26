@@ -11,3 +11,8 @@ class Dungeon(Locale, ABC):
 
     def __init__(self, schema):
         super().__init__(schema)
+        self.state['flags'] = load_flags()
+        self.state['counters'] = load_counters()
+        self.state['numbers'] = load_numbers()
+        self.state['strings'] = load_strings()
+        self.state['events'] = load_events()

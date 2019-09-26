@@ -62,7 +62,7 @@ class World(Immutable):
             for schema in schema_sets[schema_type]:
                 self._load_schema(schema_type, schema)
         self.world_template = None
-        self.id = hashlib.sha256(repr(self.get_state_template()).encode()
+        self.id_ = hashlib.sha256(repr(self.get_state_template()).encode()
                                  ).hexdigest()
         self.initialized = True
 
@@ -77,11 +77,11 @@ class World(Immutable):
             world = deepcopy(self.world_template)
         else:
             world = {
-                    'npc': {obj.id: obj.get_state_template()
+                    'npc': {obj.get_id(): obj.get_state_template()
                             for obj in npc.get_all()},
-                    'monster': {obj.id: obj.get_state_template()
+                    'monster': {obj.get_id(): obj.get_state_template()
                                 for obj in monster.get_all()},
-                    'locale': {obj.id: obj.get_state_template()
+                    'locale': {obj.get_id(): obj.get_state_template()
                                for obj in locale.get_all_locales()},
                     }
             self.world_template = deepcopy(world)
@@ -91,6 +91,9 @@ class World(Immutable):
                 'game': dict()
                 }
         return ret
+
+    def get_id(self):
+        return self.id_
 
     def _load_schema(self, path, schema):
         schema_handlers = {

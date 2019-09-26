@@ -6,4 +6,4 @@ sequence:
     text: >-
       What's up, sucker?
   - type: branch
-    event: discover_camp
+    event_id: discover_camp

@@ -114,23 +114,14 @@ class NPC(Entity):
         except KeyError:
             raise SchemaError("tried to load town object with no id field",
                               schema=schema)
-        try:
-            self.name = schema['name']
-        except KeyError:
-            raise SchemaError("tried to load town object with no id field",
-                              schema=schema)
-        self.state = {
-            'flags': load_flags(),
-            'counters': load_counters(),
-            'numbers': load_numbers(),
-            'strings': load_strings(),
-            'events': load_events()
-        }
+
+        self.state['flags'] = load_flags()
+        self.state['counters'] = load_counters()
+        self.state['numbers'] = load_numbers()
+        self.state['strings'] = load_strings()
+        self.state['events'] = load_events()
         self.initialized = True
         npc_registry[self.id_] = self
-
-    def get_state_template(self):
-        pass
 
 
 def get_all():

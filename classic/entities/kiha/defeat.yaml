@@ -172,8 +172,8 @@ sequence:
       you{dick_touch}.  The girl sighs in relief, tuckered out more from the
       sensual experience than the battle itself.  You slowly remove yourself,
       leaving the tired girl underneath the tree to rest.'
-  - type: pc_event
-    event: orgasm
+  - type: trigger
+    id: orgasm
     if:
       pc: has_dick
   - type: text

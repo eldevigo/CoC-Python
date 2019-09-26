@@ -91,7 +91,7 @@ class Session(COCClass):
         player_name = os.path.split(self.save_file)[-1]
         if player_name.endswith('csf'):
             player_name = os.path.splitext(player_name)[0]
-        new_player = playerlib.Player(player_name, self.world.id,
+        new_player = playerlib.Player(player_name, self.world.get_id(),
                                       initial_state, None)
         return new_player
 
