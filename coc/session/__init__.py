@@ -128,7 +128,9 @@ class Session(COCClass):
                         if item['type'] == 'locale':
                             locales.append(get_locale_by_id(item['id']))
                         elif item['type'] == 'eventstream':
-                            eventstreams.append(get_eventstream_by_id(item['id']))
+                            eventstreams.append(
+                                get_eventstream_by_id(item['id'])
+                            )
                         else:
                             raise IncorrectObjectTypeError(
                                 "Sequence in event ``{0}`` returned an "

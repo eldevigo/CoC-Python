@@ -63,7 +63,7 @@ class World(Immutable):
                 self._load_schema(schema_type, schema)
         self.world_template = None
         self.id_ = hashlib.sha256(repr(self.get_state_template()).encode()
-                                 ).hexdigest()
+                                  ).hexdigest()
         self.initialized = True
 
     def __setitem__(self, key, value):
@@ -145,7 +145,7 @@ class World(Immutable):
 
     @staticmethod
     def _get_event_by_id(id_):
-        return eventstream.get_by_id(id_)
+        return eventstream.get_eventstream_by_id(id_)
 
     @classmethod
     def get_locale_events(cls, id_, player):
